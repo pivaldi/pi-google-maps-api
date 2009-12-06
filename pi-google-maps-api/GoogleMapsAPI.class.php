@@ -1,0 +1,814 @@
+<?php
+
+if(isset($_GET['source'])) {
+    highlight_file(__FILE__);
+    die;
+}
+
+/*
+ *
+ * This script is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General public License for more details.
+ *
+ * This copyright notice MUST APPEAR in all copies of the script!
+ *
+ *  @authors          CERDAN Yohann <cerdanyohann@yahoo.fr>, Philippe IVALDI
+ *  @copyright        (c) 2009  CERDAN Yohann, All rights reserved
+ *  @version          Last modified: Fri Jul 24 18:35:54 CEST 2009
+ */
+
+
+require_once(dirname(__FILE__).'/Template.class.php');
+
+/* Define the googleMapsAPI install directory */
+define('GMA_PATH','/var/lib/guideregional/googlemapsapi/branches/');
+/* define('GMA_REL_PATH', str_replace(array(DIRECTORY_SEPARATOR,'//'), */
+/*                                    '/', */
+/*                                    str_replace($_SERVER['DOCUMENT_ROOT'], */
+/*                                                '', */
+/*                                                GMA_PATH_thisScript))); */
+
+/* define('GMA_CUR_PATH', dirname(str_replace('//','/', str_replace('\\','/', (php_sapi_name()=='cgi'||php_sapi_name()=='isapi' ||php_sapi_name()=='cgi-fcgi')&&($_SERVER['ORIG_PATH_TRANSLATED']?$_SERVER['ORIG_PATH_TRANSLATED']:$_SERVER['PATH_TRANSLATED'])? ($_SERVER['ORIG_PATH_TRANSLATED']?$_SERVER['ORIG_PATH_TRANSLATED']:$_SERVER['PATH_TRANSLATED']):($_SERVER['ORIG_SCRIPT_FILENAME']?$_SERVER['ORIG_SCRIPT_FILENAME']:$_SERVER['SCRIPT_FILENAME'])))).'/'); */
+
+
+
+class GIcon {
+
+    public $icon = array();
+
+    private function _getImageInfo($img) {
+        return getimagesize($img);
+        /*         $_img = strpos($img,'http') === 0 ? $img : $_SERVER['DOCUMENT_ROOT'].$img; */
+        /*         if(!($imgInfo = @getimagesize($_img))) { */
+        /*             trigger_error('_getImageInfo: error reading image: '.$_img, E_USER_ERROR); */
+        /*         } */
+        /*         return $imgInfo; */
+    }
+
+    private function _dirToPixel($flag,$n) {
+        if(is_numeric($flag)) return $flag;
+        $flag = strtolower($flag);
+        if($flag === 'x') { // Centered
+            return $n/2;
+        } elseif($flag === 'w' || $flag == 's') {// West or North
+            return $n;
+        } elseif($flag === 'e'|| $flag == 'n') {// Est or South
+            return 0;
+        }
+    }
+
+
+    /**
+     * Generate an array of params for a new marker icon image
+     * iconShadowImage is optional
+     * If anchor coords are not supplied, we use the center point of the image by default.
+     * Can be called statically.
+     * This is a modified version of createMarkerIcon from:
+     * $Id: GoogleMapAPI.class.php,v 1.63 2007/08/03 16:29:40 mohrt Exp $
+     * http://www.phpinsider.com/php/code/GoogleMapAPI/
+     *
+     * @param string $img URI to icon image: 24-bit PNG image with alpha transparency
+     * @param string $anchorX X coordinate for icon anchor point
+     * @param string $anchorY Y coordinate for icon anchor point
+     * @param string $infoWindowAnchorX X coordinate for info window anchor point
+     * @param string $infoWindowAnchorY Y coordinate for info window anchor point
+     * @param string $printImg URI to an alternate foreground icon image used for printing on browsers incapable of handling the main foreground image. Versions of IE typically require an alternative image in these cases as they cannot print the icons as transparent PNGs. Note that browsers capable of printing the main foreground image ignore this property. Transparent GIF.
+     * @param string $mozPrintImg URI to an alternate non-transparent icon image used for printing on browsers incapable of handling either transparent PNGs or transparent GIFs. Older versions of Firefox/Mozilla typically require non-transparent images for printing. Note that browsers capable of printing the main foreground image will ignore this property. Non transparent GIF with a light grey background.
+     * @param string $shadowImg URI to shadow image: 24-bit PNG image with alpha transparency.
+     * @param string $shadowPrintImg URI to a shadow image used for printed maps. This is a GIF image since most browsers cannot print PNG images. Transparent GIF with a chequered pattern of grey pixels for the shadow area.
+     * @param string $transparentImg URI to a virtually transparent version of the foreground icon image used to capture click events in Internet Explorer. This image is a 24-bit PNG version of the main foreground image with 1% opacity, but of the same shape and size.
+     * @param $imgMap represents the image map area as defined by an array of x,y pixel coordinates. Used for capturing image clicks in non IE browsers.
+     */
+
+    public function GIcon($img,
+                          $anchorX = 'x', $anchorY = 's',
+                          $infoWindowAnchorX = 'x', $infoWindowAnchorY = 'x',
+                          $printImg='', $mozPrintImg='',
+                          $shadowImg='', $shadowPrintImg='',
+                          $transparentImg='',$imgMap='') {
+
+        $imgInfo = $this->_getImageInfo($img);
+        if($shadowImg) {
+            $shadowImgInfo = $this->_getImageInfo($shadowImg);
+        }
+
+        $anchorX = $this->_dirToPixel($anchorX, $imgInfo[0]);
+        $anchorY = $this->_dirToPixel($anchorY, $imgInfo[1]);
+        $infoWindowAnchorX = $this->_dirToPixel($infoWindowAnchorX, $imgInfo[0]);
+        $infoWindowAnchorY = $this->_dirToPixel($infoWindowAnchorY, $imgInfo[1]);
+
+        $iconInfo = array('img'               => (string) $img,
+                          'iconWidth'         => (int) $imgInfo[0],
+                          'iconHeight'        => (int) $imgInfo[1],
+                          'printImg'          => (string) $printImg,
+                          'mozPrintImg'       => (string) $mozPrintImg,
+                          'shadowImg'         => (string) $shadowImg,
+                          'shadowWidth'       => (int) $shadowImgInfo[0],
+                          'shadowHeight'      => (int) $shadowImgInfo[1],
+                          'shadowPrintImg'    => (string) $shadowPrintImg,
+                          'transparentImg'    => (string) $transparentImg,
+                          'anchorX'           => (int) $anchorX,
+                          'anchorY'           => (int) $anchorY,
+                          'infoWindowAnchorX' => (int) $infoWindowAnchorX,
+                          'infoWindowAnchorY' => (int) $infoWindowAnchorY,
+                          'imgMap'          => (string) $imgMap);
+        $this->icon = $iconInfo;
+    }
+
+}
+
+class GoogleMapsAPI
+{
+    /** GoogleMap key **/
+    private $googleMapKey = '';
+
+    /** GoogleMap ID for the HTML DIV  **/
+    private $googleMapId = 'googlemapapi';
+
+    /** GoogleMap  Direction ID for the HTML DIV **/
+    private $googleMapDirectionId = 'route';
+
+    /** Width of the gmap **/
+    private $width = 0;
+
+    /** Height of the gmap **/
+    private $height = 0;
+
+    /** Icon width of the gmarker **/
+    /* private $iconWidth = 24; */
+
+    /** Icon height of the gmarker **/
+    /* private $iconHeight = 24; */
+
+    /** Infowindow width of the gmarker **/
+    private $infoWindowWidth = 250;
+
+    /** Defautl zoom of the gmap **/
+    private $zoom = 9;
+
+    /** Lang of the gmap **/
+    private $lang = 'fr';
+
+    /**Center of the gmap **/
+    private $center = 'Paris France';
+    private $needGeocoding = TRUE;
+
+    /** Content of the HTML generated **/
+    private $content = '';
+
+    /** Add the direction button to the infowindow **/
+    private $displayDirectionFields = FALSE;
+
+    /** Hide the marker by default **/
+    private $defaultHideMarker = FALSE;
+
+
+
+    /**
+       Icons shared by several markers
+    **/
+    private $sharedIcons = array();
+
+    /** Markers by coords
+        array of array('latitude','longitude','html','category','icon')
+        where ['icon'] = array('image','iconWidth','iconHeight','iconAnchorX',
+        'iconAnchorY','infoWindowAnchorX','infoWindowAnchorY',
+        'shadowWidth','shadowHeight');
+        Use the method $this->newIcon(...) to create it
+    **/
+    public $markersByCoords = array();
+
+    /** Markers by address **/
+    // array of array('address','content','category','icon');
+    public $markersByAddress = array();
+
+    /** Use clusterer to display a lot of markers on the gmap **/
+    private $useClusterer = FALSE;
+    private $gridSize = 100;
+    private $maxZoom = 9;
+    private $clustererLibrarypath;
+
+
+    /** Cache params**/
+    public $useCache = FALSE;
+    public $cacheParams = array('libs'    => array('name' => 'GMA-LIBS',
+                                                   'ttl'  => 3600),
+                                'loader' => array('name' => 'GMA-LOADER',
+                                                  'ttl'  => 3600)
+                                );
+
+    /**
+     * Class constructor
+     *
+     * @param string $googleMapKey the googleMapKey
+     *
+     * @return void
+     */
+
+    public function __construct($googleMapKey='')
+    {
+        $this->googleMapKey = $googleMapKey;
+    }
+
+    public function __destruct() {
+        // Nothing to do...
+    }
+
+
+    /**
+     * Set the key of the gmap
+     *
+     * @param string $googleMapKey the googleMapKey
+     *
+     * @return void
+     */
+
+    public function setKey($googleMapKey)
+    {
+        $this->googleMapKey = $googleMapKey;
+    }
+
+    /**
+     * Enable and set the cache parameter (use APC)
+     *
+     * @param string $suffixCacheName suffix of cache name
+     *
+     * @return array of used cache names
+     */
+
+    public function useCache($suffixCacheName='', $ttl=3600)
+    {
+        if($this->useCache == FALSE) {
+            $this->suffixCacheName = $suffixCacheName;
+            $this->useCache = TRUE;
+            $oCacheParams = array();
+            foreach($this->cacheParams as $key => $cacheParam) {
+                $this->cacheParams[$key]['name'] = $cacheParam['name'].$suffixCacheName;
+                $this->cacheParams[$key]['ttl'] = $ttl;
+            }
+        }
+        return $this->cacheParams;
+    }
+
+    /**
+     * Enable and set the clusterer parameter (optimization to display a lot of markers)
+     *
+     * @param string $clusterIcon the cluster icon
+     * @param int $maxVisibleMarkers max visible markers
+     * @param int $gridSize grid size
+     * @param int $minMarkersPerClusterer minMarkersPerClusterer
+     * @param int $maxLinesPerInfoBox maxLinesPerInfoBox
+     *
+     * @return void
+     */
+
+    public function useClusterer($clustererLibraryPath,
+                                 $gridSize=100, $maxZoom=9)
+    {
+        /* TODO: update the doc */
+        if(!@is_readable($clustererLibraryPath)) {
+            trigger_error('useClusterer: you must specifiy a valid and readable JavaScript file',
+                          E_USER_ERROR);
+        }
+        $this->useClusterer = TRUE;
+        $this->gridSize = $gridSize;
+        $this->maxZoom = $maxZoom;
+        $this->clustererLibraryPath = $clustererLibraryPath;
+    }
+
+    /**
+     * Set the ID of the default gmap DIV
+     *
+     * @param string $googleMapId the google div ID
+     *
+     * @return void
+     */
+
+    public function setDivId($googleMapId)
+    {
+        $this->googleMapId = $googleMapId;
+    }
+
+    /**
+     * Set the ID of the default gmap direction DIV
+     *
+     * @param string $googleMapDirectionId GoogleMap  Direction ID for the HTML DIV
+     *
+     * @return void
+     */
+
+    public function setDirectionDivId($googleMapDirectionId)
+    {
+        $this->googleMapDirectionId = $googleMapDirectionId;
+    }
+
+    /**
+     * Set the size of the gmap
+     *
+     * @param int $width GoogleMap  width
+     * @param int $height GoogleMap  height
+     *
+     * @return void
+     */
+
+    public function setSize($width, $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+    }
+
+    /**
+     * Set the with of the gmap infowindow (on marker clik)
+     *
+     * @param int $infoWindowWidth GoogleMap  info window width
+     *
+     * @return void
+     */
+
+    public function setInfoWindowWidth ($infoWindowWidth)
+    {
+        $this->infoWindowWidth = $infoWindowWidth;
+    }
+
+    /**
+     * Set the lang of the gmap
+     *
+     * @param string $lang GoogleMap  lang : fr,en,..
+     *
+     * @return void
+     */
+
+    public function setLang($lang)
+    {
+        $this->lang = $lang;
+    }
+
+    /**
+     * Set the zoom of the gmap
+     *
+     * @param int $zoom GoogleMap  zoom.
+     *
+     * @return void
+     */
+
+    public function setZoom($zoom)
+    {
+        $this->zoom = $zoom;
+    }
+
+    /**
+     * Set the center of the gmap (an address)
+     *
+     * @param string $center GoogleMap  center (an address)
+     *
+     * @return void
+     */
+    public function setCenterByAddress($center)
+    {
+        $this->center = $center;
+        $this->needGeocoding = TRUE;
+    }
+
+    /**
+     * Set the center of the gmap (an address)
+     *
+     * @param real $latitude
+     * @param real $longitude
+     *
+     * @return void
+     */
+    public function setCenterByCoods($latitude, $longitude)
+    {
+        $this->center = $latitude.','.$longitude;
+        $this->needGeocoding = FALSE;
+    }
+
+    /**
+     * Set the center of the gmap
+     *
+     * @param boolean $displayDirectionFields display directions or not in the info window
+     *
+     * @return void
+     */
+
+    public function setDisplayDirectionFields($displayDirectionFields)
+    {
+        $this->displayDirectionFields = $displayDirectionFields;
+    }
+
+    /**
+     * Set the defaultHideMarker
+     *
+     * @param boolean $defaultHideMarker hide all the markers on the map by default
+     *
+     * @return void
+     */
+
+    public function setDefaultHideMarker($defaultHideMarker)
+    {
+        $this->defaultHideMarker = $defaultHideMarker;
+    }
+
+    /**
+     * Get the google map content
+     *
+     * @return string the google map html code
+     */
+
+    public function getGoogleMap()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Get URL content using cURL.
+     *
+     * @param string $url the url
+     *
+     * @return string the html code
+     *
+     * @todo add proxy settings
+     */
+
+    private function getContent($url)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($curl, CURLOPT_URL, $url);
+        $data = curl_exec($curl);
+        curl_close ($curl);
+        return $data;
+    }
+
+    /**
+     * Geocoding an address (address -> lat,lng)
+     *
+     * @param string $address an address
+     *
+     * @return array array with precision, lat & lng
+     */
+
+    public function geocoding($address)
+    {
+        $encodeAddress = urlencode($address);
+        $url = "http://maps.google.com/maps/geo?q=".$encodeAddress."&output=csv&key=".$this->googleMapKey;
+
+        if(function_exists('curl_init')) {
+            $data = $this->getContent($url);
+        } else {
+            $data = file_get_contents($url);
+        }
+
+        $csvSplit = split(",", $data);
+        $status = $csvSplit[0];
+
+        if (strcmp($status, "200") == 0) {
+            $return = $csvSplit; // successful geocode, $precision = $csvSplit[1], $lat = $csvSplit[2], $lng = $csvSplit[3];
+        } else {
+            $return = null; // failure to geocode
+        }
+
+        return $return;
+    }
+
+    /**
+     * return icons and markers as JavaScript code
+     * (no templating here because of code complexity)
+     * This is inspired of the method MapJS from:
+     * $Id: GoogleMapAPI.class.php,v 1.63 2007/08/03 16:29:40 mohrt Exp $
+     * http://www.phpinsider.com/php/code/GoogleMapAPI/
+     *
+     */
+    private function _markersToJS() {
+        $_output = 'var icon = [];'."\n";
+
+        // Convert mixed type $icon to usable ressource (array or integer or NULL)
+        // Array is real icon, integer is shared icon, NULL is default icon (G_DEFAULT_ICON)
+        function _standardizeIcon($icon) {
+            if(is_string($icon)) {
+                $oIcon=new GIcon($icon);
+                return  $oIcon->icon;
+            }
+            if(is_object($icon)) return $icon->icon;
+            if(is_int($icon) || $icon == NULL) return $icon;
+            trigger_error('_standardizeIcon: invaldi icon type.', E_USER_ERROR);
+        }
+
+        // JS code creating nice icon
+        function _getIcon($icon) {
+            return "createIcon('{$icon['img']}','{$icon['printImg']}','{$icon['mozPrintImg']}','{$icon['shadowImg']}','{$icon['shadowPrintImg']}','{$icon['transparentImg']}',{$icon['anchorX']},{$icon['anchorY']},{$icon['infoWindowAnchorX']},{$icon['infoWindowAnchorY']},{$icon['iconWidth']},{$icon['iconHeight']},{$icon['shadowWidth']},{$icon['shadowHeight']},'{$icon['imgMap']}');\n";
+        }
+
+        $k = 0;
+        // Generate the JS icons for shared icons
+        for($i = 0, $j = count($this->sharedIcons); $i < $j; $i++) {
+            $icon = _standardizeIcon($this->sharedIcons[$i]);
+            if(is_int($icon)) {
+                trigger_error('_markersToJS: invaldi SHARED icon type. Strange error...', E_USER_ERROR);
+            }
+            // hash the icon data to see further if we've already got this one; if so, save some javascript
+            $iconKey = md5(serialize($icon));
+            $existIcon[$iconKey] = $i;
+            $_output .= "icon[{$i}] = "._getIcon($icon);
+            $k++;
+        }
+
+        // Generate icons (wich are not shared) and markers
+        if(!empty($this->markersByCoords)) {
+            for($i = 0, $j = count($this->markersByCoords); $i < $j; $i++) {
+                $marker = $this->markersByCoords[$i];
+                $icon = _standardizeIcon($marker['icon']);
+                if(is_int($icon)) {
+                    $jsIcon = "icon[{$icon}]";
+                } elseif(is_array($icon)) {
+                    // hash the icon data to see if we've already got this one; if so, save some javascript
+                    $iconKey = md5(serialize($icon));
+                    if(!isset($existIcon[$iconKey])) {
+                        $iconNumber = $i+$k;
+                        $existIcon[$iconKey] = $iconNumber;
+                        $_output .= "icon[{$iconNumber}] = "._getIcon($icon);
+                        $jsIcon = "icon[{$iconNumber}]";
+                    } else {
+                        $jsIcon = "icon[{$existIcon[$iconKey]}]";
+                    }
+                } else { // $icon == NULL
+                    $jsIcon = '\'\'';
+                }
+                $_output .= "createMarker({$marker['latitude']},{$marker['longitude']},'{$marker['html']}','{$marker['category']}',{$jsIcon});\n";
+            }
+        }
+        return $_output;
+    }
+
+
+    /**
+     * Add marker by his coords
+     *
+     * @param string $lat lat
+     * @param string $lng lngs
+     * @param string $html html code display in the info window
+     * @param string $category marker category
+     * @param array $icon an icon url
+     *
+     * @return void
+     */
+
+    public function addMarkerByCoords($lat, $lng, $html='', $category='', $icon=NULL)
+    {
+        $this->markersByCoords[] = array('latitude'  => $lat,
+                                         'longitude' => $lng,
+                                         'html'      => $html,
+                                         'category'  => $category,
+                                         'icon'      => $icon);
+    }
+
+    /**
+     * Add address to the stack of markers by address
+     *
+     * @param string $address an ddress
+     * @param string $content html code display in the info window
+     * @param string $category marker category
+     * @param array $icon an icon url
+     *
+     * @return void
+     */
+
+    public function addMarkerByAddress($address, $content='', $category='', $icon=NULL)
+    {
+        $this->markersByAddress[] = array('address'  => $address,
+                                          'content'  => $content,
+                                          'category' => $category,
+                                          'icon'     => $icon);
+    }
+
+    /**
+     * Add marker by an array of coord
+     *
+     * @param string $coordtab an array of lat,lng,content
+     * @param string $category marker category
+     * @param array $icon an icon url
+     *
+     * @return void
+     */
+
+    public function addArrayMarkerByCoords($coordtab, $category='', $icon=NULL)
+    {
+        $_icon = ($icon != NULL) ? array_push($this->sharedIcons,$icon)-1 : NULL;
+        foreach ($coordtab as $coord) {
+            $this->addMarkerByCoords($coord[0], $coord[1], $coord[2], $category, $_icon);
+        }
+    }
+
+    /**
+     * Add array of addresses to the stack of markers by address
+     *
+     * @param array(strings) $addresses an array of addresses
+     * @param string $category marker category
+     * @param array $icon an icon url
+     *
+     * @return void
+     */
+
+    public function addArrayMarkerByAddress($addresses, $category='', $icon=array())
+    {
+        $_icon = ($icon != NULL) ? array_push($this->sharedIcons,$icon)-1 : NULL;
+        foreach ($addresses as $address) {
+            $this->addMarkerByAddress($address[0], $address[1], $category, $_icon);
+        }
+    }
+
+
+    /**
+     * Add an address to the array markersByCoords. Need geocoding so must be called iff
+     * cache is not used or failed.
+     *
+     * @param  array('address','content','category','icon') $markerByAddress an array of address
+     *
+     * @return TRUE if it successes else return FALSE
+     */
+    private function _addMarkerByAddressToMarkersByCoords($markerByAddress)
+    {
+        $point = $this->geocoding($markerByAddress['address']);
+        if($point[0]  == "200") {
+            $this->addMarkerByCoords($point[2], $point[3], $markerByAddress['content'],
+                                     $markerByAddress['category'], $markerByAddress['icon']);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /**
+     * Add an array of address to the array markersByCoords. Need geocoding.
+     * Refer to _addMarkerByAddressToMarkersByCoords
+     *
+     * @param array(string) &$markersByAddress an array of address
+     *
+     * @return TRUE if success else return FALSE
+     */
+    private function _addMarkersByAddressToMarkersByCoords(&$markersByAddress)
+    {
+        $markerByAddress = array_pop($markersByAddress);
+        while($markerByAddress != NULL) {
+            $this->_addMarkerByAddressToMarkersByCoords($markerByAddress);
+            $markerByAddress = array_pop($markersByAddress);
+        }
+    }
+
+    /**
+     * Set a direction between 2 addresss and set a text panel
+     *
+     * @param string $from an address
+     * @param string $to an address
+     * @param string $idpanel id of the div panel
+     *
+     * @return void
+     */
+
+    public function addDirection($from, $to, $idpanel='')
+    {
+        /* $this->contentMarker .= 'addDirection("'.$from.'","'.$to.'","'.$idpanel.'");'; */
+    }
+
+    /**
+     * Parse a KML file and add markers to a category
+     *
+     * @param string $url url of the kml file compatible with gmap and gearth
+     * @param string $category marker category
+     * @param array $icon an icon url
+     *
+     * @return void
+     */
+
+    public function addKML ($url, $category='', $icon='')
+    {
+        $xml = new SimpleXMLElement($url, null, true);
+        foreach ($xml->Document->Folder->Placemark as $item) {
+            $coordinates = explode(',', (string) $item->Point->coordinates);
+            $name = (string) $item->name;
+            $this->addMarkerByCoords($coordinates[1], $coordinates[0], $name, $category, $icon);
+        }
+    }
+
+    /**
+     * Initialize the javascript code
+     *
+     * @return void
+     */
+
+    public function init()
+    {
+        // Google map JS
+        $this->content .= '<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key='.$this->googleMapKey.'" type="text/javascript">';
+        $this->content .= '</script>'."\n";
+
+        // Clusterer JS
+        if ($this->useClusterer==true) {
+            // Source: http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/1.0/src/
+            $this->content .= '<script src="'.$this->clustererLibraryPath.'" type="text/javascript"></script>'."\n";
+        }
+
+        $content == FALSE;
+        if($this->useCache) {
+            $tpl = new Template(GMA_PATH.'res/templates/libs.tpl',
+                                $this->cacheParams['libs']['name'],
+                                $this->cacheParams['libs']['ttl']);
+            $content = $tpl->tryGetCache();
+        } else $tpl = new Template(GMA_PATH.'res/templates/libs.tpl');
+        $tplParams = array();
+        if($content == FALSE) {
+            /* $tplParams['iconSize'] = $this->iconWidth.','.$this->iconHeight; */
+            // Use clusterer optimisation or not
+            $tplParams['useClusterer'] = $this->useClusterer;
+
+            // Display direction inputs in the info window
+            $tplParams['displayDirectionFields'] = $this->displayDirectionFields;
+            $tplParams['googleMapDirectionId']   = $this->googleMapDirectionId;
+
+            $tplParams['infoWindowWidth'] = $this->infoWindowWidth;
+
+            // Hide marker ?
+            $tplParams['HideMarker'] = $this->defaultHideMarker;
+
+            $tplParams['lang'] = $this->lang;
+            $tplParams['zoom'] = $this->zoom;
+
+            // Assign $tplParams values to the variable $PARAMS of the template
+            $tpl->assign('PARAMS', $tplParams);
+            // Get the content
+            $content .= $tpl->fetch();
+        }
+
+        $this->content .= '<script type="text/javascript">'."\n".$content."\n".'</script>'."\n";
+        // Google map DIV
+        $this->content .= '<div id="'.$this->googleMapId.'"';
+        if($this->width > 0 && $this->height > 0) {
+            $this->content .= ' style="width:'.$this->width.'px;height:'.$this->height.'px"';
+        }
+        $this->content .= '></div>'."\n";
+    }
+
+    /**
+     * Generate the gmap
+     *
+     * @return void
+     */
+
+    public function generate()
+    {
+
+        $this->init();
+
+        $content = FALSE;
+        if($this->useCache) {
+            $tpl = new Template(GMA_PATH.'res/templates/loader.tpl',
+                                $this->cacheParams['loader']['name'],
+                                $this->cacheParams['loader']['ttl']);
+            $content=$tpl->tryGetCache();
+        } else $tpl = new Template(GMA_PATH.'res/templates/loader.tpl');
+        $tplParams = array();
+        if($content == FALSE) {
+            // Center of the GMap
+            if($this->needGeocoding) {
+                $geocodeCentre = $this->geocoding($this->center);
+
+                if ($geocodeCentre[0]=="200") { // success
+                    $latlngCentre = $geocodeCentre[2].",".$geocodeCentre[3];
+                } else { // Paris
+                    $latlngCentre = "48.8792,2.34778";
+                }
+            } else  $latlngCentre = $this->center; // No need geocoding.
+
+
+            $tplParams['googleMapId'] = $this->googleMapId;
+            $tplParams['latlngCentre'] = $latlngCentre;
+            $tplParams['zoom'] = $this->zoom;
+            $tplParams['useClusterer'] = $this->useClusterer;
+            $tplParams['gridSize'] = $this->gridSize;
+            $tplParams['maxZoom'] = $this->maxZoom;
+
+            // Push markers by address in the markersByCoords stack
+            $this->_addMarkersByAddressToMarkersByCoords($this->markersByAddress);
+
+            // Ready to assign all the markers and params
+            /* $tpl->assign('MARKERS',$this->markersByCoords); */
+            $tpl->assign('MARKERS',$this->_markersToJS());
+            $tpl->assign('PARAMS',$tplParams);
+
+            // Get the content
+            $content=$tpl->fetch();
+        }
+
+        $this->content .= '<script type="text/javascript">'."\n";
+        $this->content .= $content."\n";
+        $this->content .= '</script>'."\n";
+    }
+}
+
+
+// Local Variables:   **
+// c-basic-offset : 4 **
+// End:               **
