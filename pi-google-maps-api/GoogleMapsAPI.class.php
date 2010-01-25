@@ -23,7 +23,7 @@ if(isset($_GET['source'])) {
 require_once(dirname(__FILE__).'/Template.class.php');
 
 /* Define the googleMapsAPI install directory */
-define('GMA_PATH','/var/lib/guideregional/googlemapsapi/branches/');
+define('GMA_PATH','/var/www/guideregional/typo3conf/ext/pi_annuaire/googlemapsapi/pi-google-maps-api/');
 /* define('GMA_REL_PATH', str_replace(array(DIRECTORY_SEPARATOR,'//'), */
 /*                                    '/', */
 /*                                    str_replace($_SERVER['DOCUMENT_ROOT'], */
