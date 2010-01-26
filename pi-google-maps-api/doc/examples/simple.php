@@ -134,8 +134,8 @@
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="text" id="kml" value="http://dev.ycerdan.fr/googlemap/kml/departements/44.kml" />
-          <input type="button" onclick="addKML(document.getElementById('kml').value);" value="Load this KML"/>
+          <input type="text" id="xml" value="http://dev.ycerdan.fr/googlemap/kml/departements/44.kml" />
+          <input type="button" onclick="addXML(document.getElementById('xml').value);" value="Load this XML"/>
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">

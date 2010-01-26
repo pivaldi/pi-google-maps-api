@@ -512,16 +512,16 @@ class GoogleMapsAPI
     }
 
     /**
-     * Parse a KML file and add markers to a category
+     * Parse a XML file and add markers to a category
      *
-     * @param string $url url of the kml file compatible with gmap and gearth
+     * @param string $url url of the xml file compatible with gmap and gearth
      * @param string $category marker category
      * @param string $icon an icon url
      *
      * @return void
      */
 
-    public function addKML ($url, $category='', $icon='')
+    public function addXML ($url, $category='', $icon='')
     {
         $xml = new SimpleXMLElement($url, null, true);
         foreach ($xml->Document->Folder->Placemark as $item) {

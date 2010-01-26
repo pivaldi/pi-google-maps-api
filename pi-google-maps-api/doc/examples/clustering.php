@@ -56,7 +56,7 @@
 	  $gmap->useClusterer('../../res/js/markerclusterer_packed.js');
           $gmap->setSize(600,600);
           $gmap->setZoom(7);
-          $gmap->addKML('../../res/kml/radar_fixe.kml','radars_fixes',
+          $gmap->addXML('../../res/xml/radar_fixe.xml','radars_fixes',
                         new GIcon('../../res/images/markers/radarFixe.png', // image marker
                                   'X','X')); // coords image anchor (x=centered, E=Est, N=Nord etc)
 

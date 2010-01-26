@@ -108,9 +108,35 @@ function toggleHideShow(category) {
     }
     map.closeInfoWindow();
 }
-function addKML(file) {
-    var oKML = new GGeoXml(file);
-    map.addOverlay(oKML);
+
+var layers = {"0":
+              {"url": "http://www.xxx",
+               "name": ""},
+              "1":
+              {"url": "http://piprim.tuxfamily.org/temp/regions.kml",
+               "name": "regionsbis"}};
+function toggleGeoXML(id, checked) {
+
+    if (checked) {
+        var geoXml = new GGeoXml(layers[id].url, function() {
+            if (geoXml.loadedCorrectly()) {
+                //geoXml.gotoDefaultViewport(map);
+
+                layers[id].geoxml = geoXml;
+                // document.getElementById("status").innerHTML = "";
+            }
+        });
+        layers[id].geoXml = geoXml;
+        map.addOverlay(layers[id].geoXml);
+        // document.getElementById("status").innerHTML = "Loading...";
+
+    } else if (layers[id].geoXml) {
+        map.removeOverlay(layers[id].geoXml);
+    }
+}
+function addXML(file) {
+    var oXML = new GGeoXml(file);
+    map.addOverlay(oXML);
 }
 function addLayerWikipedia() {
     layer_wikipedia = new GLayer("org.wikipedia.fr");
