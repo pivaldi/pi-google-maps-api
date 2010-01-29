@@ -3,10 +3,11 @@ var layers;
 var gmarkers = [];
 var gicons = [];
 var clusterer = null;
-var current_lat = 0;
-var current_lng = 0;
-var layer_wikipedia = null;
-var layer_panoramio = null;
+var currentLat = 0;
+var currentLng = 0;
+var fixedLayers = {"com.google.webcams":{},"com.panoramio.all":{},"org.wikipedia.ar":{},"org.wikipedia.bg":{},"org.wikipedia.ca":{},"org.wikipedia.cs":{},"org.wikipedia.da":{},"org.wikipedia.de":{},"org.wikipedia.el":{},"org.wikipedia.en":{},"org.wikipedia.es":{},"org.wikipedia.eu":{},"org.wikipedia.fi":{},"org.wikipedia.fr":{},"org.wikipedia.gl":{},"org.wikipedia.he":{},"org.wikipedia.hr":{},"org.wikipedia.hu":{},"org.wikipedia.id":{},"org.wikipedia.it":{},"org.wikipedia.ja":{},"org.wikipedia.lt":{},"org.wikipedia.lv":{},"org.wikipedia.nl":{},"org.wikipedia.nn":{},"org.wikipedia.no":{},"org.wikipedia.pl":{},"org.wikipedia.pt":{},"org.wikipedia.ru":{},"org.wikipedia.sk":{},"org.wikipedia.sl":{},"org.wikipedia.sv":{},"org.wikipedia.th":{},"org.wikipedia.tr":{},"org.wikipedia.uk":{},"org.wikipedia.vi":{}};
+var layerWikipedia = new GLayer("org.wikipedia.fr");
+var layerPanoramio = null;
 var trafficInfo = null;
 var directions = null;
 var geocoder = null;
@@ -60,10 +61,10 @@ function createMarker(lat,lng,html,category,icon) {
 };
 
 function getCurrentLat() {
-    return current_lat;
+    return currentLat;
 }
 function getCurrentLng() {
-    return current_lng;
+    return currentLng;
 }
 function addDirection(from,to,idpanel) {
     directionsPanel = document.getElementById(idpanel);
@@ -127,19 +128,30 @@ function addXML(file) {
     var oXML = new GGeoXml(file);
     map.addOverlay(oXML);
 }
+
+function toggleLayer(id) {
+    if(!fixedLayers[id].gLayer) {
+        fixedLayers[id].gLayer = new GLayer(id);
+        map.addOverlay(fixedLayers[id].gLayer);
+    } else if (fixedLayers[id].gLayer.isHidden()) {
+        fixedLayers[id].gLayer.show();
+    } else {
+        fixedLayers[id].gLayer.hide();
+    }
+}
+
 function addLayerWikipedia() {
-    layer_wikipedia = new GLayer("org.wikipedia.fr");
-    map.addOverlay(layer_wikipedia);
+    map.addOverlay(layerWikipedia);
 }
 function removeLayerWikipedia() {
-    map.removeOverlay(layer_wikipedia);
+    map.removeOverlay(layerWikipedia);
 }
 function addLayerPanoramio() {
-    layer_panoramio = new GLayer("com.panoramio.all");
-    map.addOverlay(layer_panoramio);
+    layerPanoramio = new GLayer("com.panoramio.all");
+    map.addOverlay(layerPanoramio);
 }
 function removeLayerPanoramio() {
-    map.removeOverlay(layer_panoramio);
+    map.removeOverlay(layerPanoramio);
 }
 function addTrafficInfo() {
     var trafficOptions = {incidents:true};

@@ -102,7 +102,7 @@
        $gmap->addArrayMarkerByAddress($coordtab,'cat2');
 
         // Adding kml layer by url
-       $gmap->addLayer("http://dev.ycerdan.fr/googlemap/kml/departements/44.kml",'dep44',true); // true = visible, false=not visible
+       $gmap->addLayer("http://dev.ycerdan.fr/googlemap/kml/departements/44.kml",'dep44',false); // true = visible, false=not visible
 
        $gmap->generate();
        echo $gmap->getGoogleMap();
@@ -125,18 +125,17 @@
         </div>
         <span class="titre">Extras : </span>
         <div class="panel">
-          <input type="button" onclick="removeLayerWikipedia();" value="Cacher wikipedia"/>
-          <input type="button" onclick="addLayerWikipedia();" value="Afficher wikipedia"/>
+          <input type="button" onclick="toggleLayer('org.wikipedia.fr');" value="Basculer wikipedia"/>
           <br />
-          <input type="button" onclick="removeLayerPanoramio();" value="Cacher panoramio"/>
-          <input type="button" onclick="addLayerPanoramio();" value="Afficher panoramio"/>
+          <input type="button" onclick="toggleLayer('com.google.webcams');" value="Basculer les WebCams"/>
           <br />
-          <input type="button" onclick="removeTrafficInfo();" value="Cacher traffic"/>
+          <input type="button" onclick="toggleLayer('com.panoramio.all');" value="Basculer les Panoramio"/>
+          <br />
           <input type="button" onclick="addTrafficInfo();" value="Afficher traffic"/>
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="button" onclick="toggleXML(1);" value="Toggle KML"/>
+          <input type="button" onclick="toggleXML(1);" value="Basculer le KML"/>
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">
