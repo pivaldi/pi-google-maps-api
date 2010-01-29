@@ -1,4 +1,5 @@
 var map;
+var layers;
 var gmarkers = [];
 var gicons = [];
 var clusterer = null;
@@ -9,7 +10,6 @@ var layer_panoramio = null;
 var trafficInfo = null;
 var directions = null;
 var geocoder = null;
-
 function createIcon(img,printImg,mozPrintImg,
                     shadowImg,shadowPrintImg,
                     transparentImg,anchorX,anchorY,
@@ -109,29 +109,18 @@ function toggleHideShow(category) {
     map.closeInfoWindow();
 }
 
-var layers = {"0":
-              {"url": "http://www.xxx",
-               "name": ""},
-              "1":
-              {"url": "http://piprim.tuxfamily.org/temp/regions.kml",
-               "name": "regionsbis"}};
-function toggleGeoXML(id, checked) {
-
-    if (checked) {
-        var geoXml = new GGeoXml(layers[id].url, function() {
-            if (geoXml.loadedCorrectly()) {
-                //geoXml.gotoDefaultViewport(map);
-
-                layers[id].geoxml = geoXml;
-                // document.getElementById("status").innerHTML = "";
-            }
-        });
+function toggleXML(id) {
+    if (!layers[id].geoXml) {
+        var geoXml = new GGeoXml(layers[id].url);
         layers[id].geoXml = geoXml;
         map.addOverlay(layers[id].geoXml);
         // document.getElementById("status").innerHTML = "Loading...";
-
-    } else if (layers[id].geoXml) {
+    } else if (layers[id].geoXml.isHidden()) {
+        map.addOverlay(layers[id].geoXml);
+        layers[id].geoXml.show();
+    } else {
         map.removeOverlay(layers[id].geoXml);
+        layers[id].geoXml.hide();
     }
 }
 function addXML(file) {

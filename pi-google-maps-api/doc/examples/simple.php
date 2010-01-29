@@ -101,6 +101,8 @@
        $coordtab []= array('orvault france','<strong>html content</strong>');
        $gmap->addArrayMarkerByAddress($coordtab,'cat2');
 
+        // Adding kml layer by url
+       $gmap->addLayer("http://dev.ycerdan.fr/googlemap/kml/departements/44.kml",'dep44',true); // true = visible, false=not visible
 
        $gmap->generate();
        echo $gmap->getGoogleMap();
@@ -134,8 +136,7 @@
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="text" id="xml" value="http://dev.ycerdan.fr/googlemap/kml/departements/44.kml" />
-          <input type="button" onclick="addXML(document.getElementById('xml').value);" value="Load this XML"/>
+          <input type="button" onclick="toggleXML(1);" value="Toggle KML"/>
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">
