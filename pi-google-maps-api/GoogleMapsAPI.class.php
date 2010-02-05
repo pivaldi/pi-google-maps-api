@@ -14,9 +14,9 @@ if(isset($_GET['source'])) {
  *
  * This copyright notice MUST APPEAR in all copies of the script!
  *
- *  @authors          CERDAN Yohann <cerdanyohann@yahoo.fr>, Philippe IVALDI
+ *  @authors          CERDAN Yohann <cerdanyohann@yahoo.fr>, Philippe Ivaldi http://www.piprime.fr/
  *  @copyright        (c) 2009  CERDAN Yohann, All rights reserved
- *  @version          Last modified: Fri Jul 24 18:35:54 CEST 2009
+ *  @version          Last modified: Fri Feb  5 16:48:29 CET 2010 by Philippe Ivaldi
  */
 
 
@@ -826,7 +826,7 @@ class GoogleMapsAPI
       $content .= $tpl->fetch();
     }
 
-    $this->content .= '<script type="text/javascript">'."\n".$content."\n".'</script>'."\n";
+    $this->content .= '<script type="text/javascript">'."\n/* <![CDATA[ */\n".$content."\n/* ]]> */\n".'</script>'."\n";
     // Google map DIV
     $this->content .= '<div id="'.$this->googleMapId.'"';
     if($this->width > 0 && $this->height > 0) {
@@ -932,8 +932,8 @@ class GoogleMapsAPI
       $content=$tpl->fetch();
     }
 
-    $this->content .= '<script type="text/javascript">'."\n";
-    $this->content .= $content."\n";
+    $this->content .= '<script type="text/javascript">'."\n/* <![CDATA[ */\n";
+    $this->content .= $content."\n/* ]]> */\n";
     $this->content .= '</script>'."\n";
   }
 }

@@ -12,7 +12,18 @@ function load() {
             echo 'var markerCluster = new MarkerClusterer(map, gmarkers,{gridSize: '.$PARAMS['gridSize'].', maxZoom: '.$PARAMS['maxZoom'].'});';
         }
             ?>
-        <?=$PARAMS['afterLoad'];?>
+            <?=$PARAMS['afterLoad'];?>
+
+        var copyright = new GCopyright(1,
+                                       new GLatLngBounds(new GLatLng(42.032974332441405, -3.9111328125),
+                                                         new GLatLng(51.17934297928927, 10.283203125)),
+                                       0,
+                                       "©2010 piprime.fr");
+        var copyrightCollection = new GCopyrightCollection('piprime.fr');
+        copyrightCollection.addCopyright(copyright);
+        var tilelayers = [new GTileLayer(copyrightCollection , 3, 11)];
+        var custommap = new GMapType(tilelayers, new GMercatorProjection(<?=$PARAMS['zoom'];?>), "piprime.fr", {errorMessage:"No data available"});
+        map.addMapType(custommap);
     }
 }
 load();
