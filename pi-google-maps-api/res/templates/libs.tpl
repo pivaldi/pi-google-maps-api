@@ -13,7 +13,7 @@
 
 var map;
 var layers;
-var gmarkers = [];
+var gmarkers = [[]];
 var clusterer = null;
 var currentLat = 0;
 var currentLng = 0;
@@ -72,7 +72,8 @@ function createMarker(lat,lng,html,category,icon) {
     html = '<div style="float:left;text-align:left;width:<?=$PARAMS['infoWindowWidth'];?>;">'+html+'</div>';
     GEvent.addListener(marker,'click',function() {marker.openInfoWindowHtml(html);});
     GEvent.addListener(marker,'infowindowclose',setCenter);
-    gmarkers.push(marker);
+    if(!gmarkers[category]) gmarkers[category] = new Array();
+    gmarkers[category].push(marker);
     <?=$PARAMS['HideMarker'] ? 'marker.hide();' : '';?>
 };
 
@@ -90,38 +91,39 @@ function addDirection(from,to,idpanel) {
     map.closeInfoWindow();
 }
 function showCategory(category) {
-    for (var i=0; i < gmarkers.length; i++) {
-	if (gmarkers[i].mycategory == category) {
-	    gmarkers[i].show();
-	}
+    for (var i=0; i < gmarkers[category].length; i++) {
+	gmarkers[category][i].show();
     }
 }
 function hideCategory(category) {
-    for (var i=0; i < gmarkers.length; i++) {
-	if (gmarkers[i].mycategory == category) {
-	    gmarkers[i].hide();
-	}
+    for (var i=0; i < gmarkers[category].length; i++) {
+	    gmarkers[category][i].hide();
     }
     map.closeInfoWindow();
 }
 function hideCategories() {
-    for (var i=0; i < gmarkers.length; i++) {
-	gmarkers[i].hide();
+    for (var cat in gmarkers) {
+        for (var i=0; i < gmarkers[cat].length; i++) {
+	    gmarkers[cat][i].hide();
+        }
     }
     map.closeInfoWindow();
 }
 function showCategories() {
-    for (var i=0; i < gmarkers.length; i++) {
-	gmarkers[i].show();
+    for (var cat in gmarkers) {
+        for (var i=0; i < gmarkers[cat].length; i++) {
+	    gmarkers[cat][i].show();
+        }
     }
     map.closeInfoWindow();
 }
 function toggleCategory(category) {
-    for (var i=0; i < gmarkers.length; i++) {
-	if (gmarkers[i].mycategory == category) {
-	    if (gmarkers[i].isHidden()) gmarkers[i].show();
-	    else gmarkers[i].hide();
-	}
+    for (var i=0; i < gmarkers[category].length; i++) {
+	if (gmarkers[category][i].isHidden()) {
+            gmarkers[category][i].show();
+        } else {
+            gmarkers[category][i].hide();
+        }
     }
     map.closeInfoWindow();
 }
