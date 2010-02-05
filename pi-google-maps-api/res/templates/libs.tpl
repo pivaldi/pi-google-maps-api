@@ -1,7 +1,6 @@
 var map;
 var layers;
 var gmarkers = [];
-var gicons = [];
 var clusterer = null;
 var currentLat = 0;
 var currentLng = 0;
@@ -11,6 +10,8 @@ var layerPanoramio = null;
 var trafficInfo = null;
 var directions = null;
 var geocoder = null;
+var polygons = [];
+
 function createIcon(img,printImg,mozPrintImg,
                     shadowImg,shadowPrintImg,
                     transparentImg,anchorX,anchorY,
@@ -48,11 +49,11 @@ function createMarker(lat,lng,html,category,icon) {
     // Display direction inputs in the info window
     html += '<div style="clear:both;height:20px;"></div>';
     id_name = 'marker_'+gmarkers.length;
-    html += '<input type="text" id="'+id_name+'"/>';
+//    html += '<input type="text" id="'+id_name+'"/>';
     from = lat+","+lng;
     idpanel = '<?=$PARAMS['googleMapDirectionId'];?>';
-    html += '<br /><input type="button" onClick="addDirection(from,document.getElementById(\''+id_name+'\').value,idpanel);" value="Arrivée"/>';
-    html += '<input type="button" onClick="addDirection(document.getElementById(\''+id_name+'\').value,from,idpanel);" value="Départ"/>';
+//    html += '<br /><input type="button" onClick="addDirection(from,document.getElementById(\''+id_name+'\').value,idpanel);" value="Arrivée"/>';
+//    html += '<input type="button" onClick="addDirection(document.getElementById(\''+id_name+'\').value,from,idpanel);" value="Départ"/>';
     <?php } ?>
     html = '<div style="float:left;text-align:left;width:<?=$PARAMS['infoWindowWidth'];?>;">'+html+'</div>';
     GEvent.addListener(marker,"click",function() {marker.openInfoWindowHtml(html);});
@@ -111,19 +112,68 @@ function toggleHideShow(category) {
 }
 
 function toggleXML(id) {
-    if (!layers[id].geoXml) {
-        var geoXml = new GGeoXml(layers[id].url);
-        layers[id].geoXml = geoXml;
+    if(!layers[id].geoXml) {
+        layers[id].geoXml = new GGeoXml(layers[id]['url']);
         map.addOverlay(layers[id].geoXml);
-        // document.getElementById("status").innerHTML = "Loading...";
     } else if (layers[id].geoXml.isHidden()) {
-        map.addOverlay(layers[id].geoXml);
         layers[id].geoXml.show();
     } else {
-        map.removeOverlay(layers[id].geoXml);
         layers[id].geoXml.hide();
     }
 }
+
+function togglePolygons(id) {
+    if(!polygons[id].polygon) {
+        addPolygon(id);
+    } else if (polygons[id].polygon.isHidden()) {
+        polygons[id].polygon.show();
+    } else {
+        polygons[id].polygon.hide();
+    }
+}
+
+function addPolygon(id) {
+    var coordinates = [];
+    var poly = polygons[id]["coords"];
+    for (var i=0; i < poly.length; i++) {
+        coordinates[i]=new GLatLng(poly[i][0],poly[i][1]);
+    }
+    polygons[id].polygon=new google.maps.Polygon(coordinates);
+    // polygons[id].polygon=new google.maps.Polygon(coordinates,"#000000", 0.5, 1, "#4d6ecd", 0.2);
+    map.addOverlay(polygons[id].polygon);
+    if(polygons[id]["fillStyle"]) polygons[id].polygon.setFillStyle(polygons[id]["fillStyle"]);
+    if(polygons[id]["strokeStyle"]) polygons[id].polygon.setStrokeStyle(polygons[id]["strokeStyle"]);
+}
+
+function polygonFromFile(file) {
+var coordinates = [
+new GLatLng(47.28204146,-2.0621128),
+new GLatLng(47.28602707,-2.047585),
+new GLatLng(47.28936802,-2.04572868)];
+    map.addOverlay(new google.maps.Polygon(coordinates,"#000000", 0.5, 1, "#4d6ecd", 0.2));
+    // GDownloadUrl(file, function(data, responseCode) {
+    //     xmlData = google.maps.Xml.parse(data);
+    //     var coords = xmlData.documentElement.getElementsByTagName("coordinate");
+    //     var coordinates = new Array();
+    //     for (var i = 0; i < coords.length; i++) {
+    //         coordinates[i] = new GLatLng(parseFloat(coords[i].getAttribute("y")),parseFloat(coords[i].getAttribute("x")));
+    //     }
+
+    //     coordinates[i+1] = coordinates[0];
+    //     polygon = new google.maps.Polygon(coordinates,"#000000", 0.5, 1, "#4d6ecd", 0.2);
+    //     map.addOverlay(polygon);
+    //     GEvent.addListener(polygon,"click",function(){alert('PASS');});
+    //     // polygon.mouseover() = function(){polygon.hide();};
+    //     GEvent.addListener(polygon,"mouseover",function(){
+    //         polygon.setFillStyle({color: '#FF0000'});
+    //     });
+    //     GEvent.addListener(polygon,"mouseout",function(){
+    //         polygon.setFillStyle({color: '#FFFF00'});
+    //     });
+    // });
+}
+
+
 function addXML(file) {
     var oXML = new GGeoXml(file);
     map.addOverlay(oXML);

@@ -160,9 +160,19 @@ class GoogleMapsAPI
 
   /** Layers of the gmap **/
   /* Structure is {'int id' => {'string url','string name','boolean visible'} */
-  private $layers = array(array());
+  private $layers = array();
 
-
+  /** explicit polygons on the gmap **/
+  /* Structure is
+     array(array('name'     => string,
+     'coords'  => array(),
+     'fillStyle'=>string,   See http://code.google.com/intl/fr/apis/maps/documentation/reference.html#GPolyStyleOptions
+     'strokeStyle'=>string, See http://code.google.com/intl/fr/apis/maps/documentation/reference.html#GPolyStyleOptions
+     'visible'=>boolean),
+     'callBack'=>string) */
+  /* callBack is some JavaScript code
+     in which the word THEPOLYGON (in uper case) will be replaced by the corresponding polygon */
+  private $polygons = array();
 
   /**
      Icons shared by several markers
@@ -691,7 +701,6 @@ class GoogleMapsAPI
     }
   }
 
-
   /**
    * Add a layer from an URL
    *
@@ -711,11 +720,69 @@ class GoogleMapsAPI
   }
 
   /**
+   * Add a layer from an URL
+   *
+   * @param string $coords: coords
+   * @param string $name: name of the polygon object
+   * @param boolean $visible: set default visibility
+   * @param string $fillStyle: set the polygon style: '{color:value,opacity:value}'
+   * See http://code.google.com/intl/fr/apis/maps/documentation/reference.html#GPolyStyleOptions
+   * @param string $strokeStyle: set the polygon style: '{color:value,opacity:value,weight:value}'
+   * See http://code.google.com/intl/fr/apis/maps/documentation/reference.html#GPolyStyleOptions
+   * @param string $callBack: JS script executed after Initialize the polygon object $name
+   *        typically used to add events.
+   * @return void
+   */
+  public function addPolygonByCoords($coords, $name='',
+                                     $visible=true,
+                                     $fillStyle='{color:"#4d6ecd",opacity:0.2}',
+                                     $strokeStyle='{color:"#331111",opacity:0.5,weight:2}',
+                                     $callBack='')
+  {
+    if($name == '') $name = 'polygon'.count($this->polygons);
+    $this->polygons[] = array('coords'      => $coords,
+                              'name'        => $name,
+                              'visible'     => $visible,
+                              'fillStyle'   => $fillStyle,
+                              'strokeStyle' => $strokeStyle,
+                              'callBack'    => $callBack);
+  }
+
+  /**
+   * Convert kml file like res/departments_fr/1/contour.kml to PHP array of coords.
+   *
+   * @param string $file: kml file location
+   *
+   * @return a string: '$coords=array(array(lat,lnt),…)'
+   */
+  private function kmlToPHPCoordinates($file) {
+    $jsOut='';
+    $xml = new SimpleXMLElement($file,null,true);
+    foreach ($xml->Document->Placemark->Polygon->outerBoundaryIs->LinearRing->coordinates as $item) {
+      /* die('PASS'); */
+      $coordinates = explode(' ', (string) $item);
+      $name   = (string) $item->name;
+      $length=count($coordinates)-1;
+      foreach ($coordinates as $key=>$coordinate) {
+      $ltlg=explode(',',$coordinate);
+      $jsOut .= '  array('.$ltlg[1].','.$ltlg[0].')';
+      if($key != $length) $jsOut .= ','."\n";
+      }
+    }
+    $jsOut = '$coords=array('."\n".$jsOut.');';
+    /* $filePart=pathinfo($file); */
+    /* $filename=$filePart['dirname'].'/'.$filePart['filename'].'.php'; */
+    /* $handle=fopen($filename, 'w'); */
+    /* fwrite($handle, "<?php\n".$jsOut."\n?>"); */
+    /* fclose($handle); */
+    return $jsOut;
+  }
+
+  /**
    * Initialize the javascript code
    *
    * @return void
    */
-
   public function init()
   {
     // Google map JS
@@ -790,19 +857,44 @@ class GoogleMapsAPI
     if($content == FALSE) {
 
       // The layers
-      $layersStr = 'layers = {';
-      $visibilityStr = '';
+      $layersDef     = 'layers = {';
+      $layersVisibilityStr = '';
+      $listener      = '';
       $count = count($this->layers)-1;
       foreach($this->layers as $key => $layer) {
-        $layersStr .= '"'.$key.'":{"url":"'.$layer['url'].'", "name":"'.$layer['name'].'"}';
+        $layersDef .= '"'.$layer['name'].'":{"url":"'.$layer['url'].'"}';
         if($key != $count) {
-          $layersStr .= ',';
+          $layersDef .= ',';
         }
         if($layer['visible']) {
-          $visibilityStr .= 'toggleXML('.$key.');'."\n";
+          $layersVisibilityStr .= 'toggleXML("'.$layer['name'].'");'."\n";
         }
+
       }
-      $layersStr .= '};'."\n".$visibilityStr;
+      $layersDef .= '};';
+
+      // The Polygons
+      $polygonsDef           = '';
+      $polygonsInit          = '';
+      $polygonsVisibilityStr = '';
+      $callBack              = '';
+      $count                 = count($this->polygons)-1;
+      foreach($this->polygons as $key => $polygon) {
+        $polygonsDef .= 'polygons["'.$polygon['name'].'"]={"coords":[';
+        $coordsCount=count($polygon['coords'])-1;
+        foreach($polygon['coords'] as $key => $coord) {
+          $polygonsDef .= '['.$coord[0].','.$coord[1].']';
+          if($key != $coordsCount) $polygonsDef .= ',';
+        }
+        $polygonsDef .= '],"fillStyle":'.$polygon['fillStyle'].
+          ',"strokeStyle":'.$polygon['strokeStyle'].
+          ',"visible":'.($polygon['visible'] ? 'true':'false').'};'."\n";
+        $callBack .= str_replace("THEPOLYGON",'polygons["'.$polygon['name'].'"].polygon',$polygon['callBack'])."\n";
+        if($polygon['visible']) {
+          $polygonsVisibilityStr .= 'togglePolygons("'.$polygon['name'].'");'."\n";
+        }
+
+      }
 
 
       // Center of the GMap
@@ -817,7 +909,10 @@ class GoogleMapsAPI
       } else  $latlngCentre = $this->center; // No need geocoding.
 
 
-      $tplParams['layers'] = $layersStr;
+      $tplParams['afterLoad'] .= $layersDef."\n".$layersVisibilityStr."\n";
+      /* $tplParams['afterLoad'] .= $polygonsDef; */
+      $tplParams['afterLoad'] .= $polygonsDef."\n".$polygonsVisibilityStr."\n";
+      $tplParams['afterLoad'] .= $callBack; // Le dernier de afterLoad.
       $tplParams['googleMapId'] = $this->googleMapId;
       $tplParams['latlngCentre'] = $latlngCentre;
       $tplParams['zoom'] = $this->zoom;

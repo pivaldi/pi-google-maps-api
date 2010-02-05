@@ -54,58 +54,60 @@
        /* $gmap->useCache('-simple',900); */
        $gmap->setDivId('test1');
        $gmap->setDirectionDivId('route');
-       $gmap->setCenterByAddress('Nantes France');
+       $gmap->setCenterByAddress('Carcassonne France');
        $gmap->setDisplayDirectionFields(true);
        $gmap->setSize(600,600);
-       $gmap->setZoom(11);
+       $gmap->setZoom(9);
        $gmap->setDefaultHideMarker(false);
 
        // cat1
        $coordtab = array();
-       $coordtab []= array('47.29273','-1.49139','<strong>html content</strong>');
-       $coordtab []= array('47.16357','-1.47354','<strong>html content</strong>');
-       $coordtab []= array('47.1822459','-1.545639','<strong>html content</strong>');
+       $coordtab []= array('43.1986689','2.206192','<strong>html content</strong>');
+       $coordtab []= array('43.241201214','2.111434936','<strong>html content</strong>');
+       $coordtab []= array('43.13406333787913','2.245330810546875','<strong>html content</strong>');
        /* $gmap->setIconSize(20,34); */
        $gmap->addArrayMarkerByCoords($coordtab,'cat1', '../../res/images/markers/yellowMarker.png');
 
-       /* $gmap->addMarkerByCoords('47.213971458','-1.556625','<strong>html content</strong>','cat3', */
-       /*                           new GIcon('../../res/images/markers/blasons/nantes/image.png',         // image marker */
+       /* $gmap->addMarkerByCoords('43.2126828', '2.3572540','<strong>html content</strong>','cat3', */
+       /*                           new GIcon('../../res/images/carcassonne/markers/image.png',         // image marker */
        /*                                     // All the others params may be omitted */
        /*                                     'X','X',                                      // coords image anchor (x=centered, E=Est, N=Nord etc) */
        /*                                     'x','x',                                      // infoWindowAnchors (x=centered) */
-       /*                                     '../../res/images/markers/blasons/nantes/printImage.gif',    // the print image */
-       /*                                     '../../res/images/markers/blasons/nantes/mozPrintImage.gif', // the print image for Mozilla */
-       /*                                     '../../res/images/markers/blasons/nantes/shadow.png',        // the shadow image */
-       /*                                     '../../res/images/markers/blasons/nantes/printShadow.gif',   // the shadow print image */
-       /*                                     '../../res/images/markers/blasons/nantes/transparent.png',   // the transparent image */
+       /*                                     '../../res/images/carcassonne/markers/printImage.gif',    // the print image */
+       /*                                     '../../res/images/carcassonne/markers/mozPrintImage.gif', // the print image for Mozilla */
+       /*                                     '../../res/images/carcassonne/markers/shadow.png',        // the shadow image */
+       /*                                     '../../res/images/carcassonne/markers/printShadow.gif',   // the shadow print image */
+       /*                                     '../../res/images/carcassonne/markers/transparent.png',   // the transparent image */
        /*                                     '')                                           // the image map (not available currently) */
        /*                           ); */
 
-       $gmap->addMarkerByAddress('Nantes France','<strong>html content</strong>','cat3',
-            new GIcon('../../res/images/markers/blasons/nantes/image.png',         // image marker
+       $gmap->addMarkerByAddress('Carcassonne France','<strong>html content</strong>','cat3',
+            new GIcon('../../res/images/carcassonne/markers/image.png',         // image marker
                       // All the others params may be omitted
                       'X','S',                                      // coords image anchor (x=centered, E=Est, N=Nord etc)
                       'x','x',                                      // coords infoWindowAnchors (x=centered)
-                      '../../res/images/markers/blasons/nantes/printImage.gif',    // the print image
-                      '../../res/images/markers/blasons/nantes/mozPrintImage.gif', // the print image for Mozilla
-                      '../../res/images/markers/blasons/nantes/shadow.png',        // the shadow image
-                      '../../res/images/markers/blasons/nantes/printShadow.gif',   // the shadow print image
-                      '../../res/images/markers/blasons/nantes/transparent.png',   // the transparent image
+                      '../../res/images/carcassonne/markers/printImage.gif',    // the print image
+                      '../../res/images/carcassonne/markers/mozPrintImage.gif', // the print image for Mozilla
+                      '../../res/images/carcassonne/markers/shadow.png',        // the shadow image
+                      '../../res/images/carcassonne/markers/printShadow.gif',   // the shadow print image
+                      '../../res/images/carcassonne/markers/transparent.png',   // the transparent image
                       '')                                           // the image map (not available currently)
                                  );
 
        // cat2
        $coordtab = array();
-       $coordtab []= array('saint-herblain france','<strong>html content</strong>');
-       $coordtab []= array('bouguenais france','<strong>html content</strong>');
-       $coordtab []= array('orvault france','<strong>html content</strong>');
+       $coordtab []= array('Limoux france','<strong>html content</strong>');
+       $coordtab []= array('Narbonne france','<strong>html content</strong>');
+       $coordtab []= array('Castelnaudary france','<strong>html content</strong>');
        $gmap->addArrayMarkerByAddress($coordtab,'cat2');
 
         // Adding kml layer by url
-       $gmap->addLayer("http://dev.ycerdan.fr/googlemap/kml/departements/44.kml",'dep44',false); // true = visible, false=not visible
+        $gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/11/contour.kml",
+                        'dep44',true); // true = visible, false=not visible
 
-       $gmap->generate();
-       echo $gmap->getGoogleMap();
+
+                        $gmap->generate();
+                        echo $gmap->getGoogleMap();
 
         ?>
       </div>
@@ -135,7 +137,7 @@
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="button" onclick="toggleXML(1);" value="Basculer le KML"/>
+          <input type="button" onclick="toggleXML('dep44');" value="Basculer le KML"/>
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">

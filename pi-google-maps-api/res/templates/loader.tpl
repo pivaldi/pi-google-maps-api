@@ -11,7 +11,7 @@ function load() {
             echo 'var markerCluster = new MarkerClusterer(map, gmarkers,{gridSize: '.$PARAMS['gridSize'].', maxZoom: '.$PARAMS['maxZoom'].'});';
         }
             ?>
-        <?=$PARAMS['layers'];?>
+        <?=$PARAMS['afterLoad'];?>
     }
 }
 load();
