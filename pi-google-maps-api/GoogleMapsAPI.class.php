@@ -891,7 +891,7 @@ class GoogleMapsAPI
           ',"visible":'.($polygon['visible'] ? 'true':'false').'};'."\n";
         $callBack .= str_replace("THEPOLYGON",'polygons["'.$polygon['name'].'"].polygon',$polygon['callBack'])."\n";
         if($polygon['visible']) {
-          $polygonsVisibilityStr .= 'togglePolygons("'.$polygon['name'].'");'."\n";
+          $polygonsVisibilityStr .= 'togglePolygon("'.$polygon['name'].'");'."\n";
         }
 
       }

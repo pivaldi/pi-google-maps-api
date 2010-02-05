@@ -72,7 +72,7 @@ function createMarker(lat,lng,html,category,icon) {
     html = '<div style="float:left;text-align:left;width:<?=$PARAMS['infoWindowWidth'];?>;">'+html+'</div>';
     GEvent.addListener(marker,'click',function() {marker.openInfoWindowHtml(html);});
     GEvent.addListener(marker,'infowindowclose',setCenter);
-   gmarkers.push(marker);
+    gmarkers.push(marker);
     <?=$PARAMS['HideMarker'] ? 'marker.hide();' : '';?>
 };
 
@@ -90,34 +90,34 @@ function addDirection(from,to,idpanel) {
     map.closeInfoWindow();
 }
 function showCategory(category) {
-    for (var i=0; i<gmarkers.length; i++) {
+    for (var i=0; i < gmarkers.length; i++) {
 	if (gmarkers[i].mycategory == category) {
 	    gmarkers[i].show();
 	}
     }
 }
 function hideCategory(category) {
-    for (var i=0; i<gmarkers.length; i++) {
+    for (var i=0; i < gmarkers.length; i++) {
 	if (gmarkers[i].mycategory == category) {
 	    gmarkers[i].hide();
 	}
     }
     map.closeInfoWindow();
 }
-function hideAll() {
-    for (var i=0; i<gmarkers.length; i++) {
+function hideCategories() {
+    for (var i=0; i < gmarkers.length; i++) {
 	gmarkers[i].hide();
     }
     map.closeInfoWindow();
 }
-function showAll() {
-    for (var i=0; i<gmarkers.length; i++) {
+function showCategories() {
+    for (var i=0; i < gmarkers.length; i++) {
 	gmarkers[i].show();
     }
     map.closeInfoWindow();
 }
-function toggleHideShow(category) {
-    for (var i=0; i<gmarkers.length; i++) {
+function toggleCategory(category) {
+    for (var i=0; i < gmarkers.length; i++) {
 	if (gmarkers[i].mycategory == category) {
 	    if (gmarkers[i].isHidden()) gmarkers[i].show();
 	    else gmarkers[i].hide();
@@ -137,13 +137,23 @@ function toggleXML(id) {
     }
 }
 
-function togglePolygons(id) {
+function togglePolygon(id) {
     if(!polygons[id].polygon) {
         addPolygon(id);
     } else if (polygons[id].polygon.isHidden()) {
         polygons[id].polygon.show();
     } else {
         polygons[id].polygon.hide();
+    }
+}
+
+function togglePolygons() {
+    for (var id in polygons) {
+        if (polygons[id].polygon.isHidden()) {
+            polygons[id].polygon.show();
+        } else {
+            polygons[id].polygon.hide();
+        }
     }
 }
 
@@ -160,34 +170,11 @@ function addPolygon(id) {
     if(polygons[id]["strokeStyle"]) polygons[id].polygon.setStrokeStyle(polygons[id]["strokeStyle"]);
 }
 
-function polygonFromFile(file) {
-var coordinates = [
-new GLatLng(47.28204146,-2.0621128),
-new GLatLng(47.28602707,-2.047585),
-new GLatLng(47.28936802,-2.04572868)];
-    map.addOverlay(new google.maps.Polygon(coordinates,"#000000", 0.5, 1, "#4d6ecd", 0.2));
-    // GDownloadUrl(file, function(data, responseCode) {
-    //     xmlData = google.maps.Xml.parse(data);
-    //     var coords = xmlData.documentElement.getElementsByTagName("coordinate");
-    //     var coordinates = new Array();
-    //     for (var i = 0; i < coords.length; i++) {
-    //         coordinates[i] = new GLatLng(parseFloat(coords[i].getAttribute("y")),parseFloat(coords[i].getAttribute("x")));
-    //     }
-
-    //     coordinates[i+1] = coordinates[0];
-    //     polygon = new google.maps.Polygon(coordinates,"#000000", 0.5, 1, "#4d6ecd", 0.2);
-    //     map.addOverlay(polygon);
-    //     GEvent.addListener(polygon,"click",function(){alert('PASS');});
-    //     // polygon.mouseover() = function(){polygon.hide();};
-    //     GEvent.addListener(polygon,"mouseover",function(){
-    //         polygon.setFillStyle({color: '#FF0000'});
-    //     });
-    //     GEvent.addListener(polygon,"mouseout",function(){
-    //         polygon.setFillStyle({color: '#FFFF00'});
-    //     });
-    // });
+function hidePolygons() {
+    for (var i in polygons) {
+        polygons[i].polygon.hide();
+    }
 }
-
 
 function addXML(file) {
     var oXML = new GGeoXml(file);
