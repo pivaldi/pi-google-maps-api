@@ -150,7 +150,7 @@
         <div style="clear:both;"></div>
       </div>
     </div>
-    <p>©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
+    <p style="clear:both">©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
     <p>
         <a href="http://validator.w3.org/check?uri=referer"><img
         src="http://www.w3.org/Icons/valid-xhtml10-blue"
