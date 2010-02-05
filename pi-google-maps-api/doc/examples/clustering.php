@@ -1,3 +1,10 @@
+<?php
+
+if(isset($_GET['source'])) {
+  highlight_file(__FILE__);
+  die;
+}
+?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -66,6 +73,8 @@
       </div>
     </div>
     <p style="clear:both">©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
+    <p>Carte Généré avec <a href="http://svn.piprime.fr/listing.php?repname=pi-google-maps-api&path=%2Ftrunk%2F">pi-google-maps-api</a></p>
+    <p>Voir <a href="?source">le code source PHP</a></p>
     <p>
         <a href="http://validator.w3.org/check?uri=referer"><img
         src="http://www.w3.org/Icons/valid-xhtml10-blue"

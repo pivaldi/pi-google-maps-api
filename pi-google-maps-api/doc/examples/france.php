@@ -1,3 +1,10 @@
+<?php
+
+if(isset($_GET['source'])) {
+  highlight_file(__FILE__);
+  die;
+}
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
@@ -54,7 +61,7 @@
           require_once('../../GoogleMapsAPI.class.php');
 
        $gmap = new GoogleMapsAPI('ABQIAAAAz7Xbm_WTkGpNU7kyMc1gghS3lcuyex_8Fgp7wndALVTrLQXUHBSpiUS5eUwxq6wOiCz4YtdnlMuOvA');
-       /* $gmap->useCache('-simple',900); */
+       /* $gmap->useCache('-simple',900); // ¡¡ NEED APC MODULE !! */
        $gmap->setDivId('test1');
        $gmap->setDirectionDivId('route');
        $gmap->setCenterByAddress('France');
@@ -62,9 +69,6 @@
        $gmap->setSize(600,600);
        $gmap->setZoom(6);
        $gmap->setDefaultHideMarker(false);
-
-       // cat1
-
 
 for ($i = 1; $i < 95; $i++) {
   if($i != 20)  {
@@ -83,6 +87,9 @@ for ($i = 1; $i < 95; $i++) {
       </div>
     </div>
     <p style="clear:both">©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
+    <p>Carte Généré avec <a href="http://svn.piprime.fr/listing.php?repname=pi-google-maps-api&path=%2Ftrunk%2F">pi-google-maps-api</a></p>
+    <p>Voir <a href="?source">le code source PHP</a></p>
+    <p>Les données définissant les frontières des départements ont été excrètes des fichiers fournis par l'excellent site « <a href="http://www.gitesdegaule.fr/KaraMeLise/">Gites de Gaule</a> ».</p>
     <p>
         <a href="http://validator.w3.org/check?uri=referer"><img
         src="http://www.w3.org/Icons/valid-xhtml10-blue"
