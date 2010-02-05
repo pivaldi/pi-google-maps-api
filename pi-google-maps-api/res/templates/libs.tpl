@@ -49,11 +49,11 @@ function createMarker(lat,lng,html,category,icon) {
     // Display direction inputs in the info window
     html += '<div style="clear:both;height:20px;"></div>';
     id_name = 'marker_'+gmarkers.length;
-//    html += '<input type="text" id="'+id_name+'"/>';
+    html += '<input type="text" id="'+id_name+'"/>';
     from = lat+","+lng;
     idpanel = '<?=$PARAMS['googleMapDirectionId'];?>';
-//    html += '<br /><input type="button" onClick="addDirection(from,document.getElementById(\''+id_name+'\').value,idpanel);" value="Arrivée"/>';
-//    html += '<input type="button" onClick="addDirection(document.getElementById(\''+id_name+'\').value,from,idpanel);" value="Départ"/>';
+    html += '<br /><input type="button" onClick="addDirection(from,document.getElementById(\''+id_name+'\').value,idpanel);" value="Arrivée"/>';
+    html += '<input type="button" onClick="addDirection(document.getElementById(\''+id_name+'\').value,from,idpanel);" value="Départ"/>';
     <?php } ?>
     html = '<div style="float:left;text-align:left;width:<?=$PARAMS['infoWindowWidth'];?>;">'+html+'</div>';
     GEvent.addListener(marker,'click',function() {marker.openInfoWindowHtml(html);});
