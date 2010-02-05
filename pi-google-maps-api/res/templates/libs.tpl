@@ -56,8 +56,9 @@ function createMarker(lat,lng,html,category,icon) {
 //    html += '<input type="button" onClick="addDirection(document.getElementById(\''+id_name+'\').value,from,idpanel);" value="Départ"/>';
     <?php } ?>
     html = '<div style="float:left;text-align:left;width:<?=$PARAMS['infoWindowWidth'];?>;">'+html+'</div>';
-    GEvent.addListener(marker,"click",function() {marker.openInfoWindowHtml(html);});
-    gmarkers.push(marker);
+    GEvent.addListener(marker,'click',function() {marker.openInfoWindowHtml(html);});
+    GEvent.addListener(marker,'infowindowclose',setCenter);
+   gmarkers.push(marker);
     <?=$PARAMS['HideMarker'] ? 'marker.hide();' : '';?>
 };
 

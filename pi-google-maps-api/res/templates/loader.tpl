@@ -1,3 +1,4 @@
+function setCenter() {map.setCenter(new GLatLng(<?=$PARAMS['latlngCentre'];?>));}
 function load() {
     if (GBrowserIsCompatible()) {
 	map = new GMap2(document.getElementById("<?=$PARAMS['googleMapId'];?>"));
