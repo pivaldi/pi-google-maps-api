@@ -49,7 +49,7 @@
         <?php
           require('../../GoogleMapsAPI.class.php');
           $gmap = new GoogleMapsAPI('ABQIAAAAz7Xbm_WTkGpNU7kyMc1gghS3lcuyex_8Fgp7wndALVTrLQXUHBSpiUS5eUwxq6wOiCz4YtdnlMuOvA');
-          $gmap->useCache('-clustering',900);
+          /* $gmap->useCache('-clustering',900); */
           $gmap->setDivId('test1');
           $gmap->setCenterByAddress('Nantes France');
           $gmap->setDisplayDirectionFields(true);
