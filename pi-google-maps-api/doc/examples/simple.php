@@ -90,7 +90,7 @@ if(isset($_GET['source'])) {
        /*                                     '')                                           // the image map (not available currently) */
        /*                           ); */
 
-       $gmap->addMarkerByAddress('Carcassonne France','<strong>html content</strong>','cat3',
+       $gmap->addMarkerByAddress('Carcassonne France','<strong>html content</strong>','blason',
             new GIcon('../../res/images/carcassonne/markers/image.png',         // image marker
                       // All the others params may be omitted
                       'X','S',                                      // coords image anchor (x=centered, E=Est, N=Nord etc)
@@ -128,25 +128,24 @@ if(isset($_GET['source'])) {
         </div>
         <span class="titre">Gestion des marqueurs : </span>
         <div class="panel">
-          <input type="button" onclick="showCategory('cat1');" value="Afficher catégories 1"/>
-          <input type="button" onclick="hideCategory('cat1');" value="Cacher catégories 1"/>
-          <br />
+          <input type="checkbox" id="toggleblasons" onclick="toggleCategory('blason');" checked /> Blasons <br />
+          <input type="checkbox" id="togglecat1" onclick="toggleCategory('cat1');" checked /> Catégorie Jaune<br />
           <input type="button" onclick="showCategory('cat2');" value="Afficher catégories 2"/>
           <input type="button" onclick="hideCategory('cat2');" value="Cacher catégories 2"/>
         </div>
         <span class="titre">Extras : </span>
         <div class="panel">
-          <input type="checkbox" id="togglewiki" onclick="toggleLayer('org.wikipedia.fr');" />Wikipédia
+          <input type="checkbox" id="togglewiki" onclick="toggleLayer('org.wikipedia.fr');" /> Wikipédia
           <br />
-          <input type="checkbox" id="togglewebcams" onclick="toggleLayer('com.google.webcams');" />WebCams
+          <input type="checkbox" id="togglewebcams" onclick="toggleLayer('com.google.webcams');" /> WebCams
           <br />
-          <input type="checkbox" id="togglepanoramio" onclick="toggleLayer('com.panoramio.all');" />Panoramio
+          <input type="checkbox" id="togglepanoramio" onclick="toggleLayer('com.panoramio.all');" /> Panoramio
           <br />
           <input type="button" onclick="addTrafficInfo();" value="Afficher traffic"/>
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="checkbox" id="toggleaude" onclick="toggleXML('dep11')" checked />Aude
+          <input type="checkbox" id="toggleaude" onclick="toggleXML('dep11')" checked /> Aude
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">
