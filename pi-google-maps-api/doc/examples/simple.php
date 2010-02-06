@@ -67,6 +67,7 @@ if(isset($_GET['source'])) {
        $gmap->setSize(600,600);
        $gmap->setZoom(9);
        $gmap->setDefaultHideMarker(false);
+       $gmap->useContextMenu('../../res/js/contextmenucontrol_packed.js');
 
        // cat1
        $coordtab = array();
@@ -111,7 +112,7 @@ if(isset($_GET['source'])) {
 
         // Adding kml layer by url
         $gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/11/contour.kml",
-                        'dep44',true); // true = visible, false=not visible
+                        'dep11',true); // true = visible, false=not visible
 
 
                         $gmap->generate();
@@ -135,21 +136,21 @@ if(isset($_GET['source'])) {
         </div>
         <span class="titre">Extras : </span>
         <div class="panel">
-          <input type="button" onclick="toggleLayer('org.wikipedia.fr');" value="Basculer wikipedia"/>
+          <input type="checkbox" id="togglewiki" onclick="toggleLayer('org.wikipedia.fr');" />Wikipédia
           <br />
-          <input type="button" onclick="toggleLayer('com.google.webcams');" value="Basculer les WebCams"/>
+          <input type="checkbox" id="togglewebcams" onclick="toggleLayer('com.google.webcams');" />WebCams
           <br />
-          <input type="button" onclick="toggleLayer('com.panoramio.all');" value="Basculer les Panoramio"/>
+          <input type="checkbox" id="togglepanoramio" onclick="toggleLayer('com.panoramio.all');" />Panoramio
           <br />
           <input type="button" onclick="addTrafficInfo();" value="Afficher traffic"/>
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="button" onclick="toggleXML('dep44');" value="Basculer le KML"/>
+          <input type="checkbox" id="toggleaude" onclick="toggleXML('dep11')" checked />Aude
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">
-          <input type="text" id="from" value="nantes" class="inputTxt" /> à <input type="text" id="to" value="paris" class="inputTxt" />
+          <input type="text" id="from" value="carcassonne" class="inputTxt" /> à <input type="text" id="to" value="toulouse 31000" class="inputTxt" />
           <input type="button" onclick="addDirection(document.getElementById('from').value,document.getElementById('to').value,'route');" value="Rechercher"/>
         </div>
         <span class="titre">Résultat de l'itinéraire : </span>

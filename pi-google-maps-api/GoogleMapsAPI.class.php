@@ -196,7 +196,8 @@ class GoogleMapsAPI
   private $useClusterer = FALSE;
   private $gridSize = 100;
   private $maxZoom = 9;
-  private $clustererLibrarypath;
+  private $clustererLibrary;
+  private $contextMenuControlLibrary;
 
 
   /** Cache params**/
@@ -271,19 +272,34 @@ class GoogleMapsAPI
    *
    * @return void
    */
-
-  public function useClusterer($clustererLibraryPath,
+  public function useClusterer($clustererLibrary,
                                $gridSize=100, $maxZoom=9)
   {
     /* TODO: update the doc */
-    if(!@is_readable($clustererLibraryPath)) {
+    if(!@is_readable($clustererLibrary)) {
       trigger_error('useClusterer: you must specifiy a valid and readable JavaScript file',
                     E_USER_ERROR);
     }
     $this->useClusterer = TRUE;
     $this->gridSize = $gridSize;
     $this->maxZoom = $maxZoom;
-    $this->clustererLibraryPath = $clustererLibraryPath;
+    $this->clustererLibrary = $clustererLibrary;
+  }
+
+  /**
+   * Enable and set the context Menu Control Library
+   * http://gmaps-utility-library-dev.googlecode.com/svn/tags/contextmenucontrol/1.0/docs/reference.html
+   * @param string $contextMenuControlLibrary: the js lib
+   *
+   * @return void
+   */
+  public function useContextMenu($contextMenuControlLibrary)
+  {
+    if(!@is_readable($contextMenuControlLibrary)) {
+      trigger_error('useContextMenu: you must specifiy a valid and readable JavaScript file',
+                    E_USER_ERROR);
+    }
+    $this->contextMenuControlLibrary = $contextMenuControlLibrary;
   }
 
   /**
@@ -792,7 +808,12 @@ class GoogleMapsAPI
     // Clusterer JS
     if ($this->useClusterer==true) {
       // Source: http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/1.0/src/
-      $this->content .= '<script src="'.$this->clustererLibraryPath.'" type="text/javascript"></script>'."\n";
+      $this->content .= '<script src="'.$this->clustererLibrary.'" type="text/javascript"></script>'."\n";
+    }
+
+    if ($this->contextMenuControlLibrary) {
+      // Source: http://gmaps-utility-library-dev.googlecode.com/svn/tags/contextmenucontrol/1.0/src/
+      $this->content .= '<script src="'.$this->contextMenuControlLibrary.'" type="text/javascript"></script>'."\n";
     }
 
     $content == FALSE;
@@ -912,6 +933,9 @@ class GoogleMapsAPI
       $tplParams['afterLoad'] .= $layersDef."\n".$layersVisibilityStr."\n";
       /* $tplParams['afterLoad'] .= $polygonsDef; */
       $tplParams['afterLoad'] .= $polygonsDef."\n".$polygonsVisibilityStr."\n";
+      if($this->contextMenuControlLibrary) {
+        $tplParams['afterLoad'] .= 'map.addControl(new ContextMenuControl());'."\n";
+      }
       $tplParams['afterLoad'] .= $callBack; // Le dernier de afterLoad.
       $tplParams['googleMapId'] = $this->googleMapId;
       $tplParams['latlngCentre'] = $latlngCentre;
