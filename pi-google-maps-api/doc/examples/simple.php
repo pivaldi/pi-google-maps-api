@@ -62,7 +62,7 @@ if(isset($_GET['source'])) {
        /* $gmap->useCache('-simple',900); */
        $gmap->setDivId('test1');
        $gmap->setDirectionDivId('route');
-       $gmap->setCenterByAddress('Carcassonne France');
+       $gmap->setCenterByAddress('Rouen France');
        $gmap->setDisplayDirectionFields(true);
        $gmap->setSize(600,600);
        $gmap->setZoom(9);
@@ -111,8 +111,18 @@ if(isset($_GET['source'])) {
        $gmap->addArrayMarkerByAddress($coordtab,'cat2');
 
         // Adding kml layer by url
-        $gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/11/contour.kml",
-                        'dep11',true); // true = visible, false=not visible
+        /* $gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/11/contour.kml", */
+/* 'dep11',true); // true = visible, false=not visible */
+/* $gmap->addLayer("http://piprim.tuxfamily.org/temp/regions_bis.kml", */
+/*                 'dep11',true); // true = visible, false=not visible */
+        $gmap->addLayer("http://piprim.tuxfamily.org/temp/regions_fr/23/contour_alt.kml",
+                        'reg23',true); // true = visible, false=not visible
+/* $gmap->addLayer("http://piprim.tuxfamily.org/temp/regions_fr/25/contour.kml", */
+/*                 'dep25',true); // true = visible, false=not visible */
+$gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/27/contour.kml",
+                'dep27',true); // true = visible, false=not visible
+$gmap->addLayer("http://piprim.tuxfamily.org/temp/departements/76/contour.kml",
+                'dep76',true); // true = visible, false=not visible
 
 
                         $gmap->generate();
@@ -145,7 +155,9 @@ if(isset($_GET['source'])) {
         </div>
         <span class="titre">Fichiers KML : </span>
         <div class="panel">
-          <input type="checkbox" id="toggleaude" onclick="toggleXML('dep11')" checked /> Aude
+          <input type="checkbox" id="toggleq" onclick="toggleXML('reg23')" checked /> reg23 <br />
+          <input type="checkbox" id="toggleds" onclick="toggleXML('dep27')" checked /> dep27 <br />
+          <input type="checkbox" id="togglexsx" onclick="toggleXML('dep76')" checked /> dep76 <br />
         </div>
         <span class="titre">Itinéraires : </span>
         <div class="panel">
