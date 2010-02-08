@@ -1,0 +1,99 @@
+<?php
+
+if(isset($_GET['source'])) {
+  highlight_file(__FILE__);
+  die;
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+      body {
+          margin: 10px; /* pour eviter les marges */
+          text-align: center; /* pour corriger le bug de centrage IE */
+          width: 1000px;
+      }
+      #global {
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      #route {
+          height: 130px;
+          overflow-y: auto;
+      }
+      #map {
+          float: left;
+      }
+      #options {
+          width: 350px;
+          float: left;
+          padding: 0 10px 10px 10px;
+          text-align: left;
+      }
+      .panel {
+          background-color: #E8ECF9;
+          border: 1px dashed black;
+          padding: 5px;
+          margin: 10px 0 10px 0;
+      }
+      .titre {
+          text-align: left;
+          font-weight: bold;
+          margin: 0 0 5px 0;
+      }
+
+      .inputTxt {
+          width: 100px;
+      }
+    </style>
+    <title>Example generated with GoogleMapsAPI.class.php</title>
+  </head>
+  <body onunload="GUnload()">
+    <h1>Cliquer sur un département pour faire une recherche sur Wikipedia</h1>
+    <div id="global">
+      <div id="map">
+        <?php
+
+        require_once('../../GoogleMapsAPI.class.php');
+       include('../../res/france/info.php');
+       $region=$_GET['region'];
+
+       $gmap = new GoogleMapsAPI('ABQIAAAAz7Xbm_WTkGpNU7kyMc1gghS3lcuyex_8Fgp7wndALVTrLQXUHBSpiUS5eUwxq6wOiCz4YtdnlMuOvA');
+       /* $gmap->useCache('-simple',900); // ¡¡ NEED APC MODULE !! */
+       $gmap->setDivId('test1');
+       $gmap->setDirectionDivId('route');
+       $gmap->setCenterByAddress($regionsLabel["$region"].' France');
+       $gmap->setDisplayDirectionFields(false);
+       $gmap->setSize(600,450);
+       $gmap->setZoom(7);
+       $gmap->setDefaultHideMarker(false);
+
+foreach($regions["$region"] as $departement) {
+  $label=$departementsLabel["$departement"];
+  include('../../res/france/departements/'.$departement.'/contour.php');
+      $gmap->addPolygonByCoords($coords,'polygon'.$departement,TRUE,
+                                '{color:\'#FFAA88\',opacity:0.2}',
+                                '{color:\'#000000\',opacity:0.5,weight:2}',
+                                'GEvent.addListener(THEPOLYGON,"click",function(){THEPOLYGON.setFillStyle({color:\'#FF0000\'});window.open("http://fr.wikipedia.org/w/index.php?title=Sp%C3%A9cial%3ARecherche&search=d%C3%A9partement+'.urlencode($label).'","popwikipedia","menubar=no, status=no, scrollbars=yes, menubar=no, width=800, height=100");});');
+  }
+
+$gmap->generate();
+  echo $gmap->getGoogleMap();
+
+        ?>
+      </div>
+    </div>
+    <p style="clear:both">©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
+    <p>Carte Généré avec <a href="http://svn.piprime.fr/listing.php?repname=pi-google-maps-api&path=%2Ftrunk%2F">pi-google-maps-api</a></p>
+    <p>Voir <a href="?source">le code source PHP</a></p>
+    <p>Les données définissant les frontières des départements ont été excrètes des fichiers fournis par l'excellent site « <a href="http://www.gitesdegaule.fr/KaraMeLise/">Gites de Gaule</a> ».</p>
+    <p>
+        <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml10-blue"
+        alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+    </p>
+  </body>
+</html>
