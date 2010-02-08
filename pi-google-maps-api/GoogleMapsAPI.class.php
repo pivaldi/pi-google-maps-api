@@ -851,7 +851,7 @@ class GoogleMapsAPI
     // Google map DIV
     $this->content .= '<div id="'.$this->googleMapId.'"';
     if($this->width > 0 && $this->height > 0) {
-      $this->content .= ' style="margin-left:auto;margin-right:auto;width:'.$this->width.'px;height:'.$this->height.'px"';
+      $this->content .= ' style="width:'.$this->width.'px;height:'.$this->height.'px"';
     }
     $this->content .= '></div>'."\n";
   }

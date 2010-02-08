@@ -17,12 +17,18 @@ if(isset($_GET['source'])) {
           margin-right: auto;
           width: 800px;
       }
+      #global {
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      #test1 {margin-left:auto;margin-right:auto;}
     </style>
     <title>Example generated with GoogleMapsAPI.class.php</title>
     <script type="text/javascript" src="../../res/js/tooltip.js"></script>
   </head>
   <body onunload="GUnload()">
-    <h1>Cliquer sur un département pour faire une recherche sur Wikipedia</h1>
+    <h1>Cliquer sur un département pour faire une recherche sur Wikipédia</h1>
     <div id="global">
       <div id="map">
         <?php

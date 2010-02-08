@@ -18,7 +18,9 @@ if(isset($_GET['source'])) {
           text-align: center;
           margin-left: auto;
           margin-right: auto;
+          width: 800px;
       }
+      #test1 {margin-left:auto;margin-right:auto;}
     </style>
     <title>Example generated with GoogleMapsAPI.class.php</title>
     <script type="text/javascript" src="../../res/js/tooltip.js"></script>
