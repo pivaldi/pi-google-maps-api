@@ -20,36 +20,9 @@ if(isset($_GET['source'])) {
           margin-left: auto;
           margin-right: auto;
       }
-      #route {
-          height: 130px;
-          overflow-y: auto;
-      }
-      #map {
-          float: left;
-      }
-      #options {
-          width: 350px;
-          float: left;
-          padding: 0 10px 10px 10px;
-          text-align: left;
-      }
-      .panel {
-          background-color: #E8ECF9;
-          border: 1px dashed black;
-          padding: 5px;
-          margin: 10px 0 10px 0;
-      }
-      .titre {
-          text-align: left;
-          font-weight: bold;
-          margin: 0 0 5px 0;
-      }
-
-      .inputTxt {
-          width: 100px;
-      }
     </style>
     <title>Example generated with GoogleMapsAPI.class.php</title>
+    <script type="text/javascript" src="../../res/js/tooltip.js"></script>
   </head>
   <body onunload="GUnload()">
     <h1>Cliquer sur un département pour faire une recherche sur Wikipedia</h1>
@@ -77,7 +50,10 @@ foreach($regions["$region"] as $departement) {
       $gmap->addPolygonByCoords($coords,'polygon'.$departement,TRUE,
                                 '{color:\'#FFAA88\',opacity:0.2}',
                                 '{color:\'#000000\',opacity:0.5,weight:2}',
-                                'GEvent.addListener(THEPOLYGON,"click",function(){THEPOLYGON.setFillStyle({color:\'#FF0000\'});window.open("http://fr.wikipedia.org/w/index.php?title=Sp%C3%A9cial%3ARecherche&search=d%C3%A9partement+'.urlencode($label).'","popwikipedia","menubar=no, status=no, scrollbars=yes, menubar=no, width=800, height=100");});');
+                                '
+GEvent.addListener(THEPOLYGON,"click",function(){window.open("http://fr.wikipedia.org/w/index.php?title=Sp%C3%A9cial%3ARecherche&search=d%C3%A9partement+'.urlencode($label).'","popwikipedia","menubar=no, status=no, scrollbars=yes, menubar=no, width=800, height=100");});
+GEvent.addListener(THEPOLYGON,"mouseover",function(){THEPOLYGON.setFillStyle({color:\'#FF0000\'});tooltip.show("'.$label.'")});
+GEvent.addListener(THEPOLYGON,"mouseout",function(){THEPOLYGON.setFillStyle({color:\'#FFAA88\'});tooltip.hide()});');
   }
 
 $gmap->generate();
@@ -95,5 +71,7 @@ $gmap->generate();
         src="http://www.w3.org/Icons/valid-xhtml10-blue"
         alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
     </p>
+    <div id="tooltip" style="position:absolute;visibility:hidden;background-color:#FFEEC7; border:1px solid black;padding:0.2em;font-size:0.8em;">
+    </div>
   </body>
 </html>
