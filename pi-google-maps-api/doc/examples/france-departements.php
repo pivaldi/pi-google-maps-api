@@ -13,12 +13,9 @@ if(isset($_GET['source'])) {
       body {
           margin: 10px; /* pour eviter les marges */
           text-align: center; /* pour corriger le bug de centrage IE */
-          width: 1000px;
-      }
-      #global {
-          text-align: center;
           margin-left: auto;
           margin-right: auto;
+          width: 800px;
       }
     </style>
     <title>Example generated with GoogleMapsAPI.class.php</title>

@@ -13,7 +13,6 @@ if(isset($_GET['source'])) {
       body {
           margin: 10px; /* pour eviter les marges */
           text-align: center; /* pour corriger le bug de centrage IE */
-          width: 1000px;
       }
       #global {
           text-align: center;
