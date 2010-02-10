@@ -9,7 +9,9 @@ function load() {
             <?php
         echo $MARKERS;
         if($PARAMS['useClusterer']) {
-            echo 'var markerCluster = new MarkerClusterer(map, gmarkers,{gridSize: '.$PARAMS['gridSize'].', maxZoom: '.$PARAMS['maxZoom'].'});';
+            echo 'for (cat in gmarkers) {';
+            echo 'var markerCluster = new MarkerClusterer(map, gmarkers[cat],{gridSize: '.$PARAMS['gridSize'].', maxZoom: '.$PARAMS['maxZoom'].'});';
+            echo '}';
         }
             ?>
 

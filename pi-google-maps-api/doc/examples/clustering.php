@@ -60,7 +60,8 @@ if(isset($_GET['source'])) {
           $gmap->setDivId('test1');
           $gmap->setCenterByAddress('Nantes France');
           $gmap->setDisplayDirectionFields(true);
-	  $gmap->useClusterer('../../res/js/markerclusterer_packed.js');
+	  $gmap->useClusterer('../../res/js/markerclusterer.js');
+/* $gmap->useClusterer('../../res/js/markerclusterer_packed.js'); */
           $gmap->setSize(600,600);
           $gmap->setZoom(7);
           $gmap->addXML('../../res/xml/radar_fixe.xml','radars_fixes',

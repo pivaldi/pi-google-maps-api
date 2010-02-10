@@ -532,7 +532,7 @@ class GoogleMapsAPI
     for($i = 0, $j = count($this->sharedIcons); $i < $j; $i++) {
       $icon = _standardizeIcon($this->sharedIcons[$i]);
       if(is_int($icon)) {
-        trigger_error('_markersToJS: invaldi SHARED icon type. Strange error...', E_USER_ERROR);
+        trigger_error('_markersToJS: invalid SHARED icon type. Strange error...', E_USER_ERROR);
       }
       // hash the icon data to see further if we've already got this one; if so, save some javascript
       $iconKey = md5(serialize($icon));
