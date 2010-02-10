@@ -151,11 +151,7 @@ function togglePolygon(id) {
 
 function togglePolygons() {
     for (var id in polygons) {
-        if (polygons[id].polygon.isHidden()) {
-            polygons[id].polygon.show();
-        } else {
-            polygons[id].polygon.hide();
-        }
+        togglePolygon(id);
     }
 }
 
