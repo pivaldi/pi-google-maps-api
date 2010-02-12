@@ -61,11 +61,9 @@ GEvent.addListener(THEPOLYGON,"mouseout",function(){THEPOLYGON.setFillStyle({col
       ?>
       </div>
     </div>
-    <p style="clear:both">©2010 <a href="http://www.piprime.fr/">PIPRIME.FR</a></p>
-    <p>Carte Généré avec <a href="http://svn.piprime.fr/listing.php?repname=pi-google-maps-api&path=%2Ftrunk%2F">pi-google-maps-api</a></p>
-    <p>Voir <a href="?source">le code source PHP</a></p>
-    <p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10-blue" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a></p>
-    <div id="tooltip" style="position:absolute;visibility:hidden;background-color:#FFEEC7; border:1px solid black;padding:0.2em;font-size:0.8em;">
-    </div>
+    <div id="tooltip" style="position:absolute;visibility:hidden;background-color:#FFEEC7; border:1px solid black;padding:0.2em;font-size:0.8em;"></div>
+    <?php
+    include('footer.php');
+    ?>
   </body>
 </html>

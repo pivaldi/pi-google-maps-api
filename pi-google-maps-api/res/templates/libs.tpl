@@ -53,7 +53,7 @@ function createIcon(img,printImg,mozPrintImg,
     return icon;
 };
 
-
+// marker6 = new GMarker(new GLatLng(47.644053,1.59046),{icon:icon6,title:"Centre"});
 function createMarker(lat,lng,html,category,icon) {
     if (!icon) icon = new GIcon(G_DEFAULT_ICON);
     var marker = new GMarker(new GLatLng(lat,lng),icon);
