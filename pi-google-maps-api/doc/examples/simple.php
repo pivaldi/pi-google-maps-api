@@ -158,7 +158,7 @@ if(isset($_GET['source'])) {
       </div>
     </div>
     <?php
-include('footer.php');
+    include('footer.php');
     ?>
   </body>
 </html>

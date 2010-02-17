@@ -39,7 +39,7 @@ var tooltip = {
  * Call this method on the mouseover event on your htmlelement
  * ex :  <div id="myHtmlElement" onmouseover="tooltip.show(this)"...></div>
  */
-tooltip.show = function (text) {
+tooltip.show = function (text,followMouse) {
 
     if(document.getElementById){
         this._tooltipElement = document.getElementById(this.id);
@@ -48,8 +48,13 @@ tooltip.show = function (text) {
     }
 
     this._saveonmouseover = document.onmousemove;
-    document.onmousemove = this.mouseMove;
-
+    if(followMouse==null || followMouse) {
+        document.onmousemove = this.mouseMove;
+        } else {
+            document.onclick = function() {
+                tooltip.hide();
+            };
+        }
     this._tooltipElement.innerHTML = text;
 
     this.moveTo(this._x + this.offsetx , this._y + this.offsety);
