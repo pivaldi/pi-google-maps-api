@@ -34,37 +34,46 @@ var tooltip = {
     _saveonmouseover:null
 }
 
+tooltip.enabled = true;
+
+tooltip.toggle = function() {
+    tooltip.enabled = !tooltip.enabled;
+    tooltip.hide();
+}
+
 /**
  * Open ToolTip. The title attribute of the htmlelement is the text of the tooltip
  * Call this method on the mouseover event on your htmlelement
  * ex :  <div id="myHtmlElement" onmouseover="tooltip.show(this)"...></div>
  */
 tooltip.show = function (text,followMouse) {
+    if(tooltip.enabled) {
+        if(document.getElementById){
+            this._tooltipElement = document.getElementById(this.id);
+        }else if ( document.all ) {
+            this._tooltipElement = document.all[this.id].style;
+        }
 
-    if(document.getElementById){
-        this._tooltipElement = document.getElementById(this.id);
-    }else if ( document.all ) {
-        this._tooltipElement = document.all[this.id].style;
-    }
-
-    this._saveonmouseover = document.onmousemove;
-    if(followMouse==null || followMouse) {
-        document.onmousemove = this.mouseMove;
+        this._saveonmouseover = document.onmousemove;
+        this._saveonclick = document.onclick;
+        if(followMouse==null || followMouse) {
+            document.onmousemove = this.mouseMove;
         } else {
             document.onclick = function() {
                 tooltip.hide();
             };
         }
-    this._tooltipElement.innerHTML = text;
+        this._tooltipElement.innerHTML = text;
 
-    this.moveTo(this._x + this.offsetx , this._y + this.offsety);
+        this.moveTo(this._x + this.offsetx , this._y + this.offsety);
 
-    if(this._tooltipElement.style){
-        this._tooltipElement.style.visibility ="visible";
-    }else{
-        this._tooltipElement.visibility = "visible";
+        if(this._tooltipElement.style){
+            this._tooltipElement.style.visibility ="visible";
+        }else{
+            this._tooltipElement.visibility = "visible";
+        }
+        return false;
     }
-    return false;
 }
 
 /**
@@ -79,6 +88,7 @@ tooltip.hide = function () {
         this._tooltipElement.visibility = "hidden";
     }
     document.onmousemove=this._saveonmouseover;
+    document.onclick=this._saveonclick;
 }
 
 
