@@ -72,8 +72,8 @@ tooltip.show = function (text,followMouse) {
         }else{
             this._tooltipElement.visibility = "visible";
         }
-        return false;
     }
+        return false;
 }
 
 /**
@@ -82,13 +82,15 @@ tooltip.show = function (text,followMouse) {
  * ex : <div id="myHtmlElement" ... onmouseout="tooltip.hide(this)"></div>
  */
 tooltip.hide = function () {
-    if(this._tooltipElement.style){
-        this._tooltipElement.style.visibility ="hidden";
-    }else{
-        this._tooltipElement.visibility = "hidden";
+    if(tooltip.enabled) {
+        if(this._tooltipElement.style){
+            this._tooltipElement.style.visibility ="hidden";
+        }else{
+            this._tooltipElement.visibility = "hidden";
+        }
+        document.onmousemove=this._saveonmouseover;
+        document.onclick=this._saveonclick;
     }
-    document.onmousemove=this._saveonmouseover;
-    document.onclick=this._saveonclick;
 }
 
 
