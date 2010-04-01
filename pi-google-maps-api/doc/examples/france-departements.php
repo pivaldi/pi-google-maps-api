@@ -33,7 +33,7 @@ if(isset($_GET['source'])) {
       <div id="map">
         <?php
 
-        require_once('../../GoogleMapsAPI.class.php');
+       require_once('../../GoogleMapsAPI.class.php');
        include('../../res/france/info.php');
        $region=$_GET['region'];
 

@@ -5,6 +5,7 @@ function load() {
 	geocoder = new GClientGeocoder();
 	map.setCenter(new GLatLng(<?=$PARAMS['latlngCentre'];?>),<?=$PARAMS['zoom'];?>);
 	map.setUIToDefault();
+        // map.addControl(new GSmallMapControl());
 	GEvent.addListener(map,"click",function(overlay,latlng) { if (latlng) { current_lat=latlng.lat();current_lng=latlng.lng(); }});
             <?php
         echo $MARKERS;

@@ -20,7 +20,7 @@ if(isset($_GET['source'])) {
  */
 
 
-require_once(dirname(__FILE__).'/Template.class.php');
+require_once(dirname(__FILE__).'/SimpleTemplate.class.php');
 
 /* Define the googleMapsAPI install directory */
 define('GMA_PATH','/var/www/guideregional/typo3conf/ext/pi_annuaire/googlemapsapi/pi-google-maps-api/');
@@ -180,11 +180,15 @@ class GoogleMapsAPI
   private $sharedIcons = array();
 
   /** Markers by coords
-      array of array('latitude','longitude','html','category','icon')
-      where ['icon'] = array('image','iconWidth','iconHeight','iconAnchorX',
-      'iconAnchorY','infoWindowAnchorX','infoWindowAnchorY',
-      'shadowWidth','shadowHeight');
-      Use the method $this->newIcon(...) to create it
+      array of array('latitude','longitude','html','category','icon','callBack')
+      where
+      * ['icon'] = array('image','iconWidth','iconHeight','iconAnchorX',
+        'iconAnchorY','infoWindowAnchorX','infoWindowAnchorY',
+        'shadowWidth','shadowHeight');
+        Use the method $this->newIcon(...) to create it
+
+      * callBack is some JavaScript code in which the word THEMARKER (in uper case) will be replaced by
+        the corresponding marker
   **/
   public $markersByCoords = array();
 
@@ -562,7 +566,11 @@ class GoogleMapsAPI
         } else { // $icon == NULL
           $jsIcon = '\'\'';
         }
-        $_output .= "createMarker({$marker['latitude']},{$marker['longitude']},'{$marker['html']}','{$marker['category']}',{$jsIcon});\n";
+        $_output .= "var tmpInstance = createMarker({$marker['latitude']},{$marker['longitude']},'{$marker['html']}','{$marker['category']}',{$jsIcon});\n";
+        if($marker['callBack'] != '') {
+            /* $_output .= 'alert(gmarkers[\''.$marker['category'].'\'].length-1)'; */
+            $_output .= str_replace("THEMARKER",'gmarkers[\''.$marker['category'].'\'][gmarkers[\''.$marker['category'].'\'].length-1]',$marker['callBack'])."\n";
+        }
       }
     }
     return $_output;
@@ -577,17 +585,21 @@ class GoogleMapsAPI
    * @param string $html html code display in the info window
    * @param string $category marker category
    * @param array $icon an icon url
+   * @param string $callBack: JS script executed after Initialize the marker object $name
+   *        typically used to add events. The string "THEMARKER" in this JS code will be
+   *        replaced by the name of the instance of the marker.
    *
    * @return void
    */
 
-  public function addMarkerByCoords($lat, $lng, $html='', $category='', $icon=NULL)
+  public function addMarkerByCoords($lat, $lng, $html='', $category='', $icon=NULL, $callBack='')
   {
     $this->markersByCoords[] = array('latitude'  => $lat,
                                      'longitude' => $lng,
                                      'html'      => $html,
                                      'category'  => $category,
-                                     'icon'      => $icon);
+                                     'icon'      => $icon,
+                                     'callBack'  => $callBack);
   }
 
   /**
@@ -746,7 +758,8 @@ class GoogleMapsAPI
    * @param string $strokeStyle: set the polygon style: '{color:value,opacity:value,weight:value}'
    * See http://code.google.com/intl/fr/apis/maps/documentation/reference.html#GPolyStyleOptions
    * @param string $callBack: JS script executed after Initialize the polygon object $name
-   *        typically used to add events.
+   *        typically used to add events. The string "THEPOLYGON" in this JS code will be
+   *         replaced by the name of the instance of the polygon.
    * @return void
    */
   public function addPolygonByCoords($coords, $name='',
@@ -818,11 +831,11 @@ class GoogleMapsAPI
 
     $content == FALSE;
     if($this->useCache) {
-      $tpl = new Template(GMA_PATH.'res/templates/libs.tpl',
+      $tpl = new SimpleTemplate(GMA_PATH.'res/templates/libs.tpl',
                           $this->cacheParams['libs']['name'],
                           $this->cacheParams['libs']['ttl']);
       $content = $tpl->tryGetCache();
-    } else $tpl = new Template(GMA_PATH.'res/templates/libs.tpl');
+    } else $tpl = new SimpleTemplate(GMA_PATH.'res/templates/libs.tpl');
     $tplParams = array();
     if($content == FALSE) {
       /* $tplParams['iconSize'] = $this->iconWidth.','.$this->iconHeight; */
@@ -869,11 +882,11 @@ class GoogleMapsAPI
 
     $content = FALSE;
     if($this->useCache) {
-      $tpl = new Template(GMA_PATH.'res/templates/loader.tpl',
+      $tpl = new SimpleTemplate(GMA_PATH.'res/templates/loader.tpl',
                           $this->cacheParams['loader']['name'],
                           $this->cacheParams['loader']['ttl']);
       $content=$tpl->tryGetCache();
-    } else $tpl = new Template(GMA_PATH.'res/templates/loader.tpl');
+    } else $tpl = new SimpleTemplate(GMA_PATH.'res/templates/loader.tpl');
     $tplParams = array();
     if($content == FALSE) {
 
@@ -898,7 +911,7 @@ class GoogleMapsAPI
       $polygonsDef           = '';
       $polygonsInit          = '';
       $polygonsVisibilityStr = '';
-      $callBack              = '';
+      $polygonCallBack              = '';
       $count                 = count($this->polygons)-1;
       foreach($this->polygons as $key => $polygon) {
         $polygonsDef .= 'polygons["'.$polygon['name'].'"]={"coords":[';
@@ -910,7 +923,7 @@ class GoogleMapsAPI
         $polygonsDef .= '],"fillStyle":'.$polygon['fillStyle'].
           ',"strokeStyle":'.$polygon['strokeStyle'].
           ',"visible":'.($polygon['visible'] ? 'true':'false').'};'."\n";
-        $callBack .= str_replace("THEPOLYGON",'polygons["'.$polygon['name'].'"].polygon',$polygon['callBack'])."\n";
+        $polygonCallBack .= str_replace("THEPOLYGON",'polygons["'.$polygon['name'].'"].polygon',$polygon['callBack'])."\n";
         if($polygon['visible']) {
           $polygonsVisibilityStr .= 'togglePolygon("'.$polygon['name'].'");'."\n";
         }
@@ -936,7 +949,7 @@ class GoogleMapsAPI
       if($this->contextMenuControlLibrary) {
         $tplParams['afterLoad'] .= 'map.addControl(new ContextMenuControl());'."\n";
       }
-      $tplParams['afterLoad'] .= $callBack; // Le dernier de afterLoad.
+      $tplParams['afterLoad'] .= $polygonCallBack; // Le dernier de afterLoad.
       $tplParams['googleMapId'] = $this->googleMapId;
       $tplParams['latlngCentre'] = $latlngCentre;
       $tplParams['zoom'] = $this->zoom;

@@ -24,7 +24,7 @@ if(!defined('APC_IS_LOADED')) {
     define('APC_IS_LOADED', extension_loaded('apc'));
 }
 
-class Template {
+class SimpleTemplate {
     private $vars;    // Holds all the template variables
     private $file;    // The file name you want to load
     private $key;     // The cache variable name (if any)
@@ -38,15 +38,15 @@ class Template {
      * @return void
      */
 
-    function Template($file, $key=NULL, $ttl=3600)
+    function SimpleTemplate($file, $key=NULL, $ttl=3600)
     {
         if (!$file || !@is_readable($file)) {
-            trigger_error('Template(): \''.$file.'\' is not a valid or readable template file',
+            trigger_error('SimpleTemplate(): \''.$file.'\' is not a valid or readable template file',
                           E_USER_ERROR);
             return false;
         }
         if($key != NULL && !APC_IS_LOADED) {
-            trigger_error('Template(): key used but module APC not loaded...',
+            trigger_error('SimpleTemplate(): key used but module APC not loaded...',
                           E_USER_NOTICE);
         }
         $this->file = $file;
