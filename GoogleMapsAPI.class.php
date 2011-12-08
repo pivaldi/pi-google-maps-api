@@ -829,7 +829,7 @@ class GoogleMapsAPI
       $this->content .= '<script src="'.$this->contextMenuControlLibrary.'" type="text/javascript"></script>'."\n";
     }
 
-    $content == FALSE;
+    $content = FALSE;
     if($this->useCache) {
       $tpl = new SimpleTemplate(GMA_PATH.'res/templates/libs.tpl',
                           $this->cacheParams['libs']['name'],
@@ -943,8 +943,7 @@ class GoogleMapsAPI
       } else  $latlngCentre = $this->center; // No need geocoding.
 
 
-      $tplParams['afterLoad'] .= $layersDef."\n".$layersVisibilityStr."\n";
-      /* $tplParams['afterLoad'] .= $polygonsDef; */
+      $tplParams['afterLoad'] = $layersDef."\n".$layersVisibilityStr."\n";
       $tplParams['afterLoad'] .= $polygonsDef."\n".$polygonsVisibilityStr."\n";
       if($this->contextMenuControlLibrary) {
         $tplParams['afterLoad'] .= 'map.addControl(new ContextMenuControl());'."\n";
